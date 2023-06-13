@@ -1,42 +1,99 @@
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap");
 
 /* Base Styles */
 * {
-    margin: 0;
-    font-family: "Quicksand";
-    color: #333;
-  }
-  
-  .navbar {
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between; 
-    margin: 0 auto;
-    border-bottom: 1px solid #f2f2f2;
-  }
-  
-  .navbar h1 {
-    font-size: 2rem;
-    color: #FFA500;
-  }
-  
-  .navbar .links {
-    font-size: 1.2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-grow: 1;
-  }
-  
-  .navbar a {
-    margin-left: 16px;
-    text-decoration: none;
-    padding: 6px;
-    transition: font-size 0.3s;
-  }
-  
-  .navbar a:hover {
-    font-size: 1.4rem;
-    color: #FFA500;
-  }
+  margin: 0;
+  font-family: "Quicksand";
+  color: #333;
+}
+body {
+  margin: 0;
+}
+
+/* Navigation Bar */
+.navbar {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 auto;
+  border-bottom: 1px solid #f2f2f2;
+}
+
+.navbar h1 {
+  align-items: center;
+  font-size: 2rem;
+  color: #ffa500;
+}
+
+.navbar .links {
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+}
+
+.navbar a {
+  margin-left: 25px;
+  text-decoration: none;
+  padding: 6px;
+  transition: font-size 0.3s;
+}
+
+.navbar a:hover {
+  font-size: 1.4rem;
+  color: #ffa500;
+}
+
+.navbar .profile {
+  margin-right: 40px;
+}
+
+/* Side Bar */
+.sidebar {
+  width: 80px;
+  height: 100vh;
+  background: #ffa500;
+  transition: width 0.3s;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar:hover {
+  width: 250px;
+}
+
+.sidebar .sidebar-link {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.sidebar .sidebar-link a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  font-size: 1.2rem;
+  color: #fff;
+}
+
+.sidebar .sidebar-link:hover {
+  background-color: #ffcc00;
+}
+
+.sidebar .sidebar-link img {
+  width: 35px;
+  height: 35px;
+  margin-left: 10px;
+  margin-right: 30px;
+}
+
+.sidebar .sidebar-link span {
+  display: none;
+}
+
+.sidebar:hover .sidebar-link span {
+  display: block;
+  margin-left: 10px;
+}
