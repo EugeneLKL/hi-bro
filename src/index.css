@@ -10,13 +10,42 @@ body {
   margin: 0;
 }
 
+/* ---------------------------------------------------------- */
+/* App Layout */
+/* ---------------------------------------------------------- */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.content-container {
+  display: flex;
+  flex: 1;
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.centered-content {
+  text-align: center;
+  margin-right: 250px;
+}
+
+/* ---------------------------------------------------------- */
 /* Navigation Bar */
+/* ---------------------------------------------------------- */
 .navbar {
   padding: 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 0 auto;
+  margin: 0;
   border-bottom: 1px solid #f2f2f2;
 }
 
@@ -50,19 +79,16 @@ body {
   margin-right: 40px;
 }
 
+/* ---------------------------------------------------------- */
 /* Side Bar */
+/* ---------------------------------------------------------- */
 .sidebar {
-  width: 80px;
+  width: 220px;
   height: 100vh;
   background: #ffa500;
-  transition: width 0.3s;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-}
-
-.sidebar:hover {
-  width: 250px;
 }
 
 .sidebar .sidebar-link {
@@ -80,6 +106,7 @@ body {
 
 .sidebar .sidebar-link:hover {
   background-color: #ffcc00;
+  font-weight: bold;
 }
 
 .sidebar .sidebar-link img {
@@ -89,11 +116,11 @@ body {
   margin-right: 30px;
 }
 
-.sidebar .sidebar-link span {
-  display: none;
+/* ---------------------------------------------------------- */
+/* Main Content */
+/* ---------------------------------------------------------- */
+.hiking-create-post {
+  position: relative;
+  margin-top: 20px;
 }
 
-.sidebar:hover .sidebar-link span {
-  display: block;
-  margin-left: 10px;
-}

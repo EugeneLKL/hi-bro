@@ -1,18 +1,14 @@
-const SideBar = () => {
+const SideBar = ({ links }) => {
   return (
     <div className="sidebar">
-      <div className="sidebar-link">
-        <a href="/">
-          <img src="discussion.png" alt="discussion icon" />
-          <span>Discussion</span>
-        </a>
-      </div>
-      <div className="sidebar-link">
-        <a href="/">
-          <img src="trails.png" alt="trails icon" />
-          <span>Trails</span>
-        </a>
-      </div>
+      {links.map((link) => (
+        <div className="sidebar-link" key={link.url}>
+          <a href={link.url}>
+            <img src={link.icon} alt={link.alt} />
+            <span>{link.label}</span>
+          </a>
+        </div>
+      ))}
     </div>
   );
 };
