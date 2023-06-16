@@ -28,3 +28,69 @@
   border-radius: 10px;
   cursor: pointer;
 }
+
+/* ---------------------------------------------------------- */
+/* Filter Post Component */
+/* ---------------------------------------------------------- */
+.hiking-filter-post {
+  display: flex;
+  align-items: center;
+  border: 1px solid black;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.filter-post-box-button {
+  background-color: #ffffff;
+  color: #000000;
+  font-weight: bold;
+  border: none;
+  padding: 10px 20px;
+  text-align: start;
+  width: 130px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.filter-post-box-button:hover {
+  background-color: #008000;
+  color: #fff;
+}
+
+/* ---------------------------------------------------------- */
+/* Display Post Component */
+/* ---------------------------------------------------------- */
+.post-link {
+  text-decoration: none;
+}
+
+.hiking-post {
+  border: 1px solid black;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  margin-top: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  text-align: start;
+}
+
+.hiking-post-username {
+  font-weight: bold;
+  padding-bottom: 10px;
+}
+
+.hiking-post-title {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.hiking-post-content {
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+.hiking-post-image {
+  width: 680px;
+  border-radius: 10px;
+}

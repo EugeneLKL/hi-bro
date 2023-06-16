@@ -1,6 +1,8 @@
 import NavBar from "./navBar";
 import SideBar from "./sideBar";
 import HikingCreatePost from "./hikingCreatePost";
+import HikingFilterPost from "./hikingFilterPost";
+import HikingDisplayPost from "./hikingDisplayPost";
 import "./hiking.css";
 
 function App() {
@@ -14,15 +16,39 @@ function App() {
   const sidebarLinks = [
     {
       url: "/",
-      icon: "discussion.png",
+      icon: "discussionIcon.png",
       alt: "discussion icon",
       label: "Discussion",
     },
     {
       url: "/",
-      icon: "trails.png",
+      icon: "trailsIcon.png",
       alt: "trails icon",
       label: "Trails",
+    },
+  ];
+
+  const posts = [
+    {
+      id: 1,
+      username: "user1",
+      title: "Post 1",
+      content: "This is the content of post 1.",
+      imageUrl: "tempPostImage.png"
+    },
+    {
+      id: 2,
+      username: "user2",
+      title: "Post 2",
+      content: "This is the content of post 2.",
+      imageUrl: "tempPostImage.png"
+    },
+    {
+      id: 3,
+      username: "user3",
+      title: "Post 3",
+      content: "This is the content of post 3.",
+      imageUrl: "tempPostImage.png"
     },
   ];
 
@@ -41,13 +67,21 @@ function App() {
           <div className="centered-content">
             {/* Profile image should be actual user profile image */}
             <HikingCreatePost profileImage={profileImage} />
+            <HikingFilterPost />
+            {posts.map((post) => (
+              <HikingDisplayPost
+                key={post.id}
+                username={post.username}
+                title={post.title}
+                content={post.content}
+                imageUrl={post.imageUrl}
+              />
+            ))}
           </div>
-          {/* Other app content */}
         </div>
       </div>
     </div>
   );
-  
 }
 
 export default App;
