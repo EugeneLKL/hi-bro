@@ -29,6 +29,26 @@
   cursor: pointer;
 }
 
+.dark-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dialog-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
 /* ---------------------------------------------------------- */
 /* Filter Post Component */
 /* ---------------------------------------------------------- */
@@ -94,3 +114,127 @@
   width: 680px;
   border-radius: 10px;
 }
+
+/* ---------------------------------------------------------- */
+/* Post Form Component */
+/* ---------------------------------------------------------- */
+.post-form h2 {
+  padding: 10px 15px;
+}
+
+.post-form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; 
+  border: 1px solid black;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+  background: white;
+  width: 700px;
+}
+
+.form-row {
+  margin-bottom: 10px;
+  padding-left: 15px;
+  width: 665px;
+}
+
+label {
+  font-weight: bold;
+}
+
+input {
+  width: 100%;
+  padding: 5px;
+  margin-left: 0; 
+}
+
+.form-row textarea {
+  resize: none;
+  max-height: 10em;
+  min-height: 5em;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+button {
+  margin-left: 10px;
+}
+
+#title,
+#content {
+  font-size: 1rem;
+  width: 100%; 
+}
+
+.style-textarea {
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+}
+
+.style-textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.style-input {
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+}
+
+.style-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.form-post-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+}
+
+.form-post-button:hover {
+  background-color: #0056b3;
+}
+
+.form-post-button:active {
+  background-color: #003c80;
+}
+
+.form-cancel-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  margin-right: -11px;
+  border: none;
+  border-radius: 4px;
+  background-color: #ff0000; 
+  color: #fff;
+  cursor: pointer;
+}
+
+.form-cancel-button:hover {
+  background-color: #cc0000;
+}
+
+.form-cancel-button:active {
+  background-color: #990000;
+}
+
+

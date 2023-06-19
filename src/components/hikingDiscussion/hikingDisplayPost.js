@@ -7,7 +7,7 @@ const HikingPost = ({ username, title, content, imageUrl }) => {
         <h3 className="hiking-post-title">{title}</h3>
         <div className="hiking-post-content">{content}</div>
         {imageUrl && (
-          <img className="hiking-post-image" src={imageUrl} alt="Post Image" />
+          <img className="hiking-post-image" src={imageUrl} alt="Post" />
         )}
       </div>
     </a>

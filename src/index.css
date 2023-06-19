@@ -5,6 +5,7 @@
   margin: 0;
   font-family: "Quicksand";
   color: #333;
+  scroll-behavior: smooth;
 }
 body {
   margin: 0;
@@ -85,9 +86,9 @@ body {
 .sidebar {
   width: 220px;
   background: #ffa500;
-  height: 200vh;
+  height: 100%;
   flex-direction: column;
-  overflow: auto;
+  overflow: auto;   
 }
 
 .sidebar .sidebar-link {
