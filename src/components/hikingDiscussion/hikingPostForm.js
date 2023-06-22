@@ -1,8 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const HikingPostForm = ({ onCancel, onPost }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+
+  // const [backendData, setBackendData] = useState([{}]);
+
+  // useEffect(() => {
+  //   fetch("/api").then(
+  //     response => response.json()
+  //   ).then(
+  //     data => {
+  //       setBackendData(data)
+  //     }
+  //   )
+  // }, []);
 
   const handleTitleChange = (event) => {
     setTitle(event.target.value);
@@ -12,15 +24,32 @@ const HikingPostForm = ({ onCancel, onPost }) => {
     setContent(event.target.value);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onPost({ title, content });
-  };
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+
+  //   try {
+  //     const newPost = await prisma.hikingPost.create({
+  //       data: {
+  //         title,
+  //         content,
+  //       },
+  //     });
+
+  //     console.log("Post created successfully:", newPost);
+  //     // Handle success or show success message to the user
+
+  //     setTitle("");
+  //     setContent("");
+  //   } catch (error) {
+  //     console.error("Error creating post:", error);
+  //     // Handle error or show error message to the user
+  //   }
+  // };
 
   return (
     <div className="post-form">
       <h2>Create a Post</h2>
-      <form onSubmit={handleSubmit}>
+      <form> 
         <div className="form-row">
           <input
             className="style-input"
@@ -45,8 +74,12 @@ const HikingPostForm = ({ onCancel, onPost }) => {
           />
         </div>
         <div className="form-actions">
-          <button className="form-post-button">Post</button>
-          <button className="form-cancel-button" onClick={onCancel}>Cancel</button>
+          <button className="form-post-button">
+            Post
+          </button>
+          <button className="form-cancel-button" onClick={onCancel}>
+            Cancel
+          </button>
         </div>
       </form>
     </div>

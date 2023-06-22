@@ -1,8 +1,10 @@
 {
   "name": "hi-bro",
   "version": "0.1.0",
+  "proxy": "http://localhost:5000",
   "private": true,
   "dependencies": {
+    "@prisma/client": "^4.15.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -12,7 +14,11 @@
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.0.0"
+    "@babel/plugin-proposal-private-property-in-object": "^7.0.0",
+    "prisma": "^4.15.0"
+  },
+  "prisma": {
+    "schema": "src/prisma/schema.prisma"
   },
   "scripts": {
     "start": "react-scripts start",
