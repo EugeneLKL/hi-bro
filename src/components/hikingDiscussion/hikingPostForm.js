@@ -1,20 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const HikingPostForm = ({ onCancel, onPost }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-
-  // const [backendData, setBackendData] = useState([{}]);
-
-  // useEffect(() => {
-  //   fetch("/api").then(
-  //     response => response.json()
-  //   ).then(
-  //     data => {
-  //       setBackendData(data)
-  //     }
-  //   )
-  // }, []);
+  const [images, setImages] = useState([]);
 
   const handleTitleChange = (event) => {
     setTitle(event.target.value);
@@ -24,32 +16,66 @@ const HikingPostForm = ({ onCancel, onPost }) => {
     setContent(event.target.value);
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
+  const handleImageChange = (event) => {
+    const selectedImages = Array.from(event.target.files);
+    setImages(selectedImages);
+  };
 
-  //   try {
-  //     const newPost = await prisma.hikingPost.create({
-  //       data: {
-  //         title,
-  //         content,
-  //       },
-  //     });
+  const handleFormSubmit = async (event) => {
+    event.preventDefault();
+  
+    try {
+      const formData = { title, content, imageUrl: '' };
+      const file = images[0];
+  
+      // Create a new post
+      const response = await axios.post("/api/posts", { formData });
+  
+      // Get secure URL from the server
+      // const { data } = await axios.get("/s3Url");
 
-  //     console.log("Post created successfully:", newPost);
-  //     // Handle success or show success message to the user
+      // // Post the image directly to the S3 bucket
+      // await axios.put(data.url, file)
 
-  //     setTitle("");
-  //     setContent("");
-  //   } catch (error) {
-  //     console.error("Error creating post:", error);
-  //     // Handle error or show error message to the user
-  //   }
-  // };
-
+      // const imageUrl = data.url.split("?")[0];
+      // formData.imageUrl = imageUrl;
+  
+      // // Store the URL in the PostgreSQL database using Prisma
+      // await axios.put(`/api/posts/${response.data.postId}`, { imageUrl });
+  
+      // Handle the response or perform additional actions
+      console.log("New post created:", response.data);
+  
+      // Show toast message
+      toast.success("Post created successfully", {
+        position: toast.POSITION.TOP_CENTER,
+        autoClose: 2000,
+        hideProgressBar: true,
+        transition: toast.slideIn,
+      });
+  
+      // Reset the form fields
+      setTitle("");
+      setContent("");
+  
+      // Close the dialog box
+      onPost();
+    } catch (error) {
+      console.error(error);
+      // Handle the error or display an error message
+      toast.error("Failed to create post", {
+        position: toast.POSITION.TOP_CENTER,
+        autoClose: 2000,
+        hideProgressBar: true,
+        transition: toast.slideIn,
+      });
+    }
+  };
+  
   return (
     <div className="post-form">
       <h2>Create a Post</h2>
-      <form> 
+      <form onSubmit={handleFormSubmit}>
         <div className="form-row">
           <input
             className="style-input"
@@ -59,6 +85,7 @@ const HikingPostForm = ({ onCancel, onPost }) => {
             value={title}
             onChange={handleTitleChange}
             maxLength={75}
+            required
           />
         </div>
         <div className="form-row">
@@ -70,11 +97,19 @@ const HikingPostForm = ({ onCancel, onPost }) => {
             value={content}
             onChange={handleContentChange}
             rows={5}
-            maxLength={400}
+            maxLength={300}
+            required
           />
         </div>
         <div className="form-actions">
-          <button className="form-post-button">
+          <input
+            className="upload-button"
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleImageChange}
+          />
+          <button className="form-post-button" type="submit">
             Post
           </button>
           <button className="form-cancel-button" onClick={onCancel}>
@@ -87,3 +122,8 @@ const HikingPostForm = ({ onCancel, onPost }) => {
 };
 
 export default HikingPostForm;
+
+
+
+
+

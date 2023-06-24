@@ -1,5 +1,6 @@
 import { useState } from "react";
 import HikingPostForm from "./hikingPostForm";
+import "react-toastify/dist/ReactToastify.css";
 
 const HikingCreatePost = ({ profileImage }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);

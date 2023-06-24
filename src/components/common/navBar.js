@@ -1,22 +1,24 @@
-const NavBar = ({ title, links, profileIcon }) => {
+import { Link } from "react-router-dom";
+
+const NavBar = () => {
+  const title = "Hi-Bro"
+  const profileIcon = "./profileIcon.png"
+
   return (
     <nav className="navbar">
       <h1>{title}</h1>
       <div className="links">
-        {links.map((link) => (
-          <a key={link.href} style={{ width: link.width }} href={link.href}>
-            {link.label}
-          </a>
-        ))}
+        <Link to="/hiking">Hiking</Link>
+        <Link to="/travelBuddy">Travel Buddy</Link>
       </div>
       <div className="profile">
-        <a href="/profile">
+        <Link to="/profile">
           <img
             style={{ width: "40px", height: "40px" }}
             src={profileIcon}
             alt="profile icon"
           />
-        </a>
+        </Link>
       </div>
     </nav>
   );
