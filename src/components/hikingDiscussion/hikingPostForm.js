@@ -23,29 +23,31 @@ const HikingPostForm = ({ onCancel, onPost }) => {
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
-  
+
     try {
-      const formData = { title, content, imageUrl: '' };
-      const file = images[0];
-  
-      // Create a new post
-      const response = await axios.post("/api/posts", { formData });
-  
-      // Get secure URL from the server
-      // const { data } = await axios.get("/s3Url");
+      const formData = new FormData();
 
-      // // Post the image directly to the S3 bucket
-      // await axios.put(data.url, file)
+      // Append all images to the form data without a unique name
+      images.forEach((image) => {
+        formData.append("images", image);
+      });
 
-      // const imageUrl = data.url.split("?")[0];
-      // formData.imageUrl = imageUrl;
-  
-      // // Store the URL in the PostgreSQL database using Prisma
-      // await axios.put(`/api/posts/${response.data.postId}`, { imageUrl });
-  
+      // Upload the images to the backend
+      const uploadResponse = await axios.post("/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      const imageUrl = uploadResponse.data.imageUrl; // Get the URLs of the uploaded images
+
+      // Create a new post with the image URLs
+      const newPostData = { title, content, imageUrl };
+      const response = await axios.post("/api/posts", newPostData);
+
       // Handle the response or perform additional actions
       console.log("New post created:", response.data);
-  
+
       // Show toast message
       toast.success("Post created successfully", {
         position: toast.POSITION.TOP_CENTER,
@@ -53,11 +55,11 @@ const HikingPostForm = ({ onCancel, onPost }) => {
         hideProgressBar: true,
         transition: toast.slideIn,
       });
-  
+
       // Reset the form fields
       setTitle("");
       setContent("");
-  
+
       // Close the dialog box
       onPost();
     } catch (error) {
@@ -71,7 +73,7 @@ const HikingPostForm = ({ onCancel, onPost }) => {
       });
     }
   };
-  
+
   return (
     <div className="post-form">
       <h2>Create a Post</h2>
@@ -79,25 +81,24 @@ const HikingPostForm = ({ onCancel, onPost }) => {
         <div className="form-row">
           <input
             className="style-input"
-            placeholder="Enter title (Max 75 characters)"
+            placeholder="Enter title (Max 300 characters)"
             type="text"
             id="title"
             value={title}
             onChange={handleTitleChange}
-            maxLength={75}
+            maxLength={300}
             required
           />
         </div>
         <div className="form-row">
           <textarea
             className="style-textarea"
-            placeholder="Enter post content (Max 300 characters)"
+            placeholder="Text (Required)"
             type="text"
             id="content"
             value={content}
             onChange={handleContentChange}
             rows={5}
-            maxLength={300}
             required
           />
         </div>
@@ -122,8 +123,3 @@ const HikingPostForm = ({ onCancel, onPost }) => {
 };
 
 export default HikingPostForm;
-
-
-
-
-
