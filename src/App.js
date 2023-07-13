@@ -1,34 +1,21 @@
-import HikingDiscussion from "./pages/HikingDiscussion";
+import HikingDiscussion from "./pages/hikingDiscussion";
 import "./hiking.css";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import NavBar from "./components/common/navBar";
-import SideBar from "./components/common/sideBar";
+import NavBar from "./components/common/NavBar";
+import SideBar from "./components/common/SideBar";
+import PostPage from "./pages/hikingPost/[postId]";
 
 function App() {
-
-  const sidebarLinks = [
-    {
-      to: "/discussion",
-      icon: "discussionIcon.png",
-      alt: "discussion icon",
-      label: "Discussion",
-    },
-    {
-      to: "/trails",
-      icon: "trailsIcon.png",
-      alt: "trails icon",
-      label: "Trails",
-    },
-  ];
 
   return (
     <Router>
       <div className="app-container">
         <NavBar />
         <div className="content-container">
-          <SideBar links={sidebarLinks} />
+          <SideBar />
           <Routes>
             <Route path="/" element={<HikingDiscussion />} />
+            <Route path="/hikingPost/:postId" element={<PostPage />}/>
           </Routes>
         </div>
       </div>

@@ -1,0 +1,9 @@
+HikingDiscussion.js
+
+Dedicated
+1. hikingCreatePost
+2. hikingDisplayPost
+3. hikingFilterPost
+Common
+1. hikingPostForm - Create post
+2. searchBar

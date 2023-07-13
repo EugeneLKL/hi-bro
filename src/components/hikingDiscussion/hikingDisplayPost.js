@@ -1,7 +1,10 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
-const HikingPost = ({ username, title, content, imageUrl }) => {
+// TODO - Add username
+const HikingPost = ({ title, content, imageUrl, postId }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const username = "Steve";
 
   const handlePrevImage = (event) => {
     event.preventDefault();
@@ -18,12 +21,19 @@ const HikingPost = ({ username, title, content, imageUrl }) => {
   };
 
   return (
-    <a href="/" className="post-link">
+    <Link to={`hikingPost/${postId}`} className="post-link">
       <div className="hiking-post">
-        <h5 className="hiking-post-username">{username}</h5>
+        <div className="hiking-post-header">
+          <img
+            className="profile-image"
+            src="/img/profileIcon.png"
+            alt="profile"
+          />
+          <h5 className="hiking-post-username">{username}</h5>
+        </div>
         <h3 className="hiking-post-title">{title}</h3>
         <div className="hiking-post-content">{content}</div>
-        {imageUrl && (
+        {imageUrl && imageUrl.length > 0 && (
           <div className="hiking-post-images">
             <div className="image-slider">
               <button
@@ -49,7 +59,7 @@ const HikingPost = ({ username, title, content, imageUrl }) => {
           </div>
         )}
       </div>
-    </a>
+    </Link>
   );
 };
 

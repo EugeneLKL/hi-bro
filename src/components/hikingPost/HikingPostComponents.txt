@@ -1,0 +1,10 @@
+[postId].js
+
+Dedicated
+1. hikingCreateComment
+2. hikingPostComments
+3. hikingPostDetails
+4. hikingVote
+Common
+1. hikingPostForm - Edit post
+

@@ -1,43 +1,52 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import HikingCreatePost from "../components/hikingDiscussion/hikingCreatePost";
-import HikingFilterPost from "../components/hikingDiscussion/hikingFilterPost";
-import HikingDisplayPost from "../components/hikingDiscussion/hikingDisplayPost";
+import HikingCreatePost from "../components/hikingDiscussion/HikingCreatePost";
+import HikingFilterPost from "../components/hikingDiscussion/HikingFilterPost";
+import HikingDisplayPost from "../components/hikingDiscussion/HikingDisplayPost";
 import { ToastContainer } from "react-toastify";
+import SearchBar from "../components/common/SearchBar";
 
 const HikingDiscussion = () => {
-  const profileImage = "/profileIcon.png";
-  const [posts, setPosts] = useState([]);
+  const profileImage = "/img/profileIcon.png";
+  const [posts, setPosts] = useState(undefined);
 
+  // fetch /api/posts/:postId
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await axios.get("/api/posts");
+        let posts = "/api/posts";
+        const response = await axios.get(posts);
         setPosts(response.data);
       } catch (error) {
         console.error(error);
         // Handle the error or display an error message
       }
     };
-
-    fetchPosts();
-  }, []);
+    if (!posts) {
+      fetchPosts();
+    }
+  }, [posts]);
 
   return (
     <div className="main-content">
       <div className="centered-content">
+        <SearchBar setPosts={setPosts} />
         {/* Profile image should be actual user profile image */}
-        <HikingCreatePost profileImage={profileImage} />
+        <HikingCreatePost
+          profileImage={profileImage}
+        />
         <HikingFilterPost />
-        {posts.map((post) => (
-          <HikingDisplayPost
-            key={post.postId}
-            username={post.username}
-            title={post.title}
-            content={post.content}
-            imageUrl={post.imageUrl}
-          />
-        ))}
+        {posts &&
+          posts.map((post) => (
+            <HikingDisplayPost
+              key={post.postId}
+              postId={post.postId}
+              username={post.username}
+              title={post.title}
+              content={post.content}
+              imageUrl={post.imageUrl}
+            />
+          ))}
       </div>
       <ToastContainer />
     </div>

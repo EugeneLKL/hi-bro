@@ -1,9 +1,95 @@
-import { useState } from "react";
-import HikingPostForm from "./hikingPostForm";
+import { useState, useRef, useEffect } from "react";
+import HikingPostForm from "../common/HikingPostForm";
 import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 const HikingCreatePost = ({ profileImage }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const dialogRef = useRef(null);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [images, setImages] = useState([]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dialogRef.current && !dialogRef.current.contains(event.target)) {
+        setIsDialogOpen(false);
+      }
+    };
+
+    const handleKeyPress = (event) => {
+      if (event.key === "Escape") {
+        setIsDialogOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyPress);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyPress);
+    };
+  }, []);
+
+  const handleFormSubmit = async (event) => {
+    event.preventDefault();
+
+    try {
+      const formData = new FormData();
+
+      // Append all images to the form data without a unique name
+      images.forEach((image) => {
+        formData.append("images", image);
+      });
+
+      // Upload the images to the backend
+      const uploadResponse = await axios.post("/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      const imageUrl = uploadResponse.data.imageUrl; // Get the URLs of the uploaded images
+
+      // Create a new post with the image URLs
+      const newPostData = { title, content, imageUrl };
+      const response = await axios.post("/api/posts", newPostData);
+
+      // Handle the response or perform additional actions
+      console.log("New post created:", response.data);
+
+      // Show toast message
+      toast.success("Post created successfully", {
+        position: toast.POSITION.TOP_CENTER,
+        autoClose: 2000,
+        hideProgressBar: true,
+        transition: toast.slideIn,
+      });
+
+      // Reset the form fields
+      setTitle("");
+      setContent("");
+
+      // Close the dialog box
+      handleDialogClose();
+
+      // Reload the page
+      setTimeout(function () {
+        window.location.reload();
+      }, 2000);
+    } catch (error) {
+      console.error(error);
+      // Handle the error or display an error message
+      toast.error("Failed to create post", {
+        position: toast.POSITION.TOP_CENTER,
+        autoClose: 2000,
+        hideProgressBar: true,
+        transition: toast.slideIn,
+      });
+    }
+  };
 
   const handleButtonClick = () => {
     setIsDialogOpen(true);
@@ -11,6 +97,19 @@ const HikingCreatePost = ({ profileImage }) => {
 
   const handleDialogClose = () => {
     setIsDialogOpen(false);
+  };
+
+  const handleTitleChange = (event) => {
+    setTitle(event.target.value);
+  };
+
+  const handleContentChange = (event) => {
+    setContent(event.target.value);
+  };
+
+  const handleImageChange = (event) => {
+    const selectedImages = Array.from(event.target.files);
+    setImages(selectedImages);
   };
 
   return (
@@ -21,7 +120,17 @@ const HikingCreatePost = ({ profileImage }) => {
       </button>
       {isDialogOpen && (
         <div className="dark-overlay">
-          <HikingPostForm onCancel={handleDialogClose} onPost={handleDialogClose} />
+          <div ref={dialogRef}>
+            <HikingPostForm
+              onCancel={handleDialogClose}
+              onSubmit={handleFormSubmit}
+              handleTitleChange={handleTitleChange}
+              handleContentChange={handleContentChange}
+              handleImageChange={handleImageChange}
+              formTitle="Create Post"
+              leftBtn="Post"
+            />
+          </div>
         </div>
       )}
     </div>

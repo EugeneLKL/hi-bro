@@ -5,7 +5,7 @@ const HikingFilterPost = () => {
     };
   
     return (
-      <div className="hiking-create-post">
+      <div className="hiking-filter-post">
         <button id="filter-latest" className="filter-post-box-button" onClick={handleButtonClick}>
           Latest
         </button>

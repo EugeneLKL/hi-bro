@@ -1,5 +1,6 @@
+/* hikingDiscussion */
 /* ---------------------------------------------------------- */
-/* Create Post Component */
+/* hikingCreatePost.js */
 /* ---------------------------------------------------------- */
 .hiking-create-post {
   display: flex;
@@ -40,6 +41,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 98;
 }
 
 .dialog-content {
@@ -50,7 +52,7 @@
 }
 
 /* ---------------------------------------------------------- */
-/* Filter Post Component */
+/* hikingFilterPost.js */
 /* ---------------------------------------------------------- */
 .hiking-filter-post {
   display: flex;
@@ -79,7 +81,7 @@
 }
 
 /* ---------------------------------------------------------- */
-/* Display Post Component */
+/* hikingDisplayPost.js */
 /* ---------------------------------------------------------- */
 .post-link {
   text-decoration: none;
@@ -96,14 +98,32 @@
   max-width: 690px;
 }
 
+.hiking-post-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.hiking-post-header h5 {
+  padding: 0;
+}
+
+.hiking-post-header img {
+  width: 30px;
+  height: 30px;
+  margin-right: 15px;
+}
+
 .hiking-post-username {
   font-weight: bold;
   padding-bottom: 10px;
+  text-decoration: none;
 }
 
 .hiking-post-title {
   font-size: 1.2rem;
   margin-bottom: 10px;
+  text-decoration: none;
 }
 
 .hiking-post-content {
@@ -113,17 +133,22 @@
 
 .hiking-post-images {
   position: relative;
-  max-height: 500px; 
-  display: flex; 
+  max-height: 500px;
+  display: flex;
   align-items: center;
-  justify-content: center; 
+  justify-content: center;
+}
+
+.hiking-post img {
+  max-width: 650px;
+  max-height: 500px;
 }
 
 .image-slider {
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden; 
+  overflow: hidden;
   width: 100%;
   height: 500px;
 }
@@ -163,7 +188,7 @@
 }
 
 /* ---------------------------------------------------------- */
-/* Post Form Component */
+/* hikingPostForm.js */
 /* ---------------------------------------------------------- */
 .post-form h2 {
   padding: 10px 15px;
@@ -286,4 +311,217 @@ button {
 
 .upload-button {
   margin-left: 10px;
+}
+
+/* hikingPost */
+/* ---------------------------------------------------------- */
+/* hikingVote.js */
+/* ---------------------------------------------------------- */
+.hiking-post-vote {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-right: 10px;
+  width: 690px;
+  margin-top: 10px;
+}
+
+.vote-count {
+  margin: 10px;
+  min-width: 80px;
+}
+
+#down {
+  transform: rotate(180deg);
+}
+
+.voteUp, .voteDown {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+/* ---------------------------------------------------------- */
+/* hikingPostDetails.js */
+/* ---------------------------------------------------------- */
+.post-buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 25px;
+}
+
+.post-options {
+  border: none;
+  background: none;
+  cursor: pointer;
+  position: absolute;
+  margin-left: 660px;
+}
+
+.share-button, .report-button {
+  border: none;
+  background: none;
+  display: flex;
+  text-align: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.share-button span, .report-button span {
+  font-size: 1.2em;
+  padding-left: 5px;
+}
+
+.share-button img, .report-button img {
+  width: 20px;
+  height: 20px;
+}
+
+.share-button {
+  display: flex;
+  align-items: center;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 0;
+  padding: 0;
+}
+
+.share-button img {
+  margin-right: 8px;
+}
+
+.share-option-list {
+  position: absolute;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  list-style: none;
+  transform: translateY(80px);
+  padding: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  align-items: center;
+}
+
+.options-option-list {
+  position: absolute;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  list-style: none;
+  transform: translate(645px, 40px);
+  padding: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  align-items: center;
+}
+
+.share-option-list li, .options-option-list li {
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.share-option-list li:hover, .options-option-list li:hover {
+  background-color: #f0f0f0;
+}
+
+.share-icon, .option-icon {
+  width: 20px;
+  margin-right: 7px;
+  transform: translateY(3px);
+}
+
+/* ---------------------------------------------------------- */
+/* hikingCreateComment.js */
+/* ---------------------------------------------------------- */
+.comment-form {
+  border: 1px solid black;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.comment-form .comment-input{
+  margin: 10px;
+  resize: none;
+  min-height: 5em;
+  padding-left: 5px;
+  width: 525px;
+  font-size: 1em;
+}
+
+.comment-form img {
+  width: 32px;
+  height: 32px;
+  margin-left: 10px;
+}
+
+.comment-form .comment-button {
+  background-color: #008000;
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  padding: 15px;
+  text-align: start;
+  width: fit-content;
+  border-radius: 10px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.comment-form form {
+  display: flex;
+  align-items: center;
+}
+
+/* ---------------------------------------------------------- */
+/* hikingPostComments.js */
+/* ---------------------------------------------------------- */
+.comment {
+  border: 1px solid black;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  margin-top: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  text-align: start;
+  max-width: 690px;
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+
+}
+
+.comment-username {
+  font-weight: bold;
+  font-size: 1rem;
+  padding-left: 20px;
+  text-decoration: none;
+}
+
+.comment-content {
+  font-size: 0.9rem;
+  margin-left: 50px;
+}
+
+.comment img {
+  width: 30px;
+  height: 30px;
+}
+
+.show-more-button {
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #ccc;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.show-more-button:hover {
+  background-color: #e0e0e0;
 }

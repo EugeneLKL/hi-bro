@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 const NavBar = () => {
   const title = "Hi-Bro"
-  const profileIcon = "./profileIcon.png"
+  const profileIcon = "/img/profileIcon.png"
 
   return (
     <nav className="navbar">
