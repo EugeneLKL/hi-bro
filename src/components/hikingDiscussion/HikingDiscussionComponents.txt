@@ -5,5 +5,5 @@ Dedicated
 2. hikingDisplayPost
 3. hikingSortPost
 Common
-1. hikingPostForm - Create post
+1. hikingForm - Create post
 2. searchBar

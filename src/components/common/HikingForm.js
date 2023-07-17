@@ -1,8 +1,9 @@
 import "react-toastify/dist/ReactToastify.css";
 
-const HikingPostForm = ({
+const HikingForm = ({
   onCancel,
   onSubmit,
+  isUploadOpen,
   handleTitleChange,
   handleContentChange,
   handleImageChange,
@@ -10,10 +11,10 @@ const HikingPostForm = ({
   content,
   formTitle,
   leftBtn,
+  contentPlaceholder,
 }) => {
-
   return (
-    <div className="post-form">
+    <div className="hiking-discussion-form">
       <h2>{formTitle}</h2>
       <form onSubmit={onSubmit}>
         <div className="form-row">
@@ -31,7 +32,7 @@ const HikingPostForm = ({
         <div className="form-row">
           <textarea
             className="style-textarea"
-            placeholder="Text (Required)"
+            placeholder={contentPlaceholder}
             type="text"
             id="content"
             value={content}
@@ -41,14 +42,18 @@ const HikingPostForm = ({
           />
         </div>
         <div className="form-actions">
-          <input
-            className="upload-button"
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleImageChange}
-          />
-          <button className="form-post-button" type="submit">
+          {isUploadOpen && (
+            <div>
+              <input
+                className="upload-button"
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImageChange}
+              />
+            </div>
+          )}
+          <button className="form-hiking-discussion-button" type="submit">
             {leftBtn}
           </button>
           <button className="form-cancel-button" onClick={onCancel}>
@@ -60,4 +65,4 @@ const HikingPostForm = ({
   );
 };
 
-export default HikingPostForm;
+export default HikingForm;

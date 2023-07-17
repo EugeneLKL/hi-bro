@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { FaFacebook, FaInstagram, FaLink } from "react-icons/fa";
 import { MdDelete, MdEdit } from "react-icons/md";
-import HikingPostForm from "../common/HikingPostForm";
+import HikingForm from "../common/HikingForm";
 import ConfirmationModal from "../common/Confirmation";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -20,7 +20,12 @@ const HikingPostDetails = ({
   const [optionDropdownOpen, setOptionDropdownOpen] = useState(false);
   const [showModalDelete, setShowModalDelete] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [reportDialogOpen, setReportDialogOpen] = useState(false);
+  const [reportTitle, setReportTitle] = useState("");
+  const [reportContent, setReportContent] = useState("");
   const dialogRef = useRef(null);
+  const editFormRef = useRef(null);
+  const reportFormRef = useRef(null);
 
   const handleOptionClick = () => {
     setOptionDropdownOpen(!optionDropdownOpen);
@@ -32,6 +37,11 @@ const HikingPostDetails = ({
 
   const handleCancel = useCallback(() => {
     setShowModalDelete(false);
+  }, []);
+
+  const handleReportButtonClick = useCallback(() => {
+    setReportDialogOpen(true);
+    console.log("Report button clicked");
   }, []);
 
   const handleEditButtonClick = useCallback(() => {
@@ -96,7 +106,7 @@ const HikingPostDetails = ({
   const [newContent, setNewContent] = useState("");
   const [images, setImages] = useState([]);
 
-  const handleFormSubmit = useCallback(
+  const handleEditFormSubmit = useCallback(
     async (event) => {
       event.preventDefault();
 
@@ -122,7 +132,18 @@ const HikingPostDetails = ({
         const response = await axios.patch(`/api/posts/${postId}`, newPostData);
 
         console.log("Post edited:", response.data);
-        window.location.reload();
+
+        toast.success("Post edited", {
+          position: toast.POSITION.TOP_CENTER,
+          autoClose: 2000,
+          hideProgressBar: true,
+          transition: toast.slideIn,
+        });
+
+        // add delaytime to reload page
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
       } catch (error) {
         console.error(error);
         toast.error("Failed to edit post", {
@@ -136,8 +157,12 @@ const HikingPostDetails = ({
     [images, postId, newTitle, newContent]
   );
 
-  const handleDialogClose = useCallback(() => {
+  const handleEditDialogClose = useCallback(() => {
     setEditDialogOpen(false);
+  }, []);
+
+  const handleReportDialogClose = useCallback(() => {
+    setReportDialogOpen(false);
   }, []);
 
   const handleTitleChange = useCallback((event) => {
@@ -153,14 +178,39 @@ const HikingPostDetails = ({
     setImages(selectedImages);
   }, []);
 
-  const handleClickOutside = useCallback(
-    (event) => {
-      if (dialogRef.current && !dialogRef.current.contains(event.target)) {
-        setEditDialogOpen(false);
-      }
-    },
-    [dialogRef]
-  );
+  const handleClickOutside = useCallback((event) => {
+    const isShareDropdownClick = event.target.closest(".share-option-list");
+    const isOptionDropdownClick = event.target.closest(".options-option-list");
+
+    if (
+      dialogRef.current &&
+      !dialogRef.current.contains(event.target) &&
+      event.target.className !== "post-options" // Exclude the post-options button
+    ) {
+      setOptionDropdownOpen(false);
+    }
+
+    if (
+      editFormRef.current &&
+      !editFormRef.current.contains(event.target) &&
+      event.target.className !== "post-options" // Exclude the post-options button
+    ) {
+      setEditDialogOpen(false);
+    }
+
+    if (
+      reportFormRef.current &&
+      !reportFormRef.current.contains(event.target) &&
+      event.target.className !== "report-button" // Exclude the report button
+    ) {
+      setReportDialogOpen(false);
+    }
+
+    if (!isShareDropdownClick && !isOptionDropdownClick) {
+      setOptionDropdownOpen(false);
+      setShareDropdownOpen(false);
+    }
+  }, []);
 
   const handleKeyPress = useCallback((event) => {
     if (event.key === "Escape") {
@@ -178,14 +228,54 @@ const HikingPostDetails = ({
     };
   }, [handleClickOutside, handleKeyPress]);
 
+  const handleReportTitleChange = useCallback((event) => {
+    setReportTitle(event.target.value);
+  }, []);
+
+  const handleReportContentChange = useCallback((event) => {
+    setReportContent(event.target.value);
+  }, []);
+
+  const handleReportFormSubmit = useCallback(
+    async (event) => {
+      event.preventDefault();
+
+      try {
+        const newReportData = {
+          title: reportTitle,
+          content: reportContent,
+        };
+
+        const response = await axios.post(
+          `/api/posts/${postId}/report`,
+          newReportData
+        );
+
+        toast.success("Report submitted", {
+          position: toast.POSITION.TOP_CENTER,
+          autoClose: 2000,
+          hideProgressBar: true,
+          transition: toast.slideIn,
+        });
+
+        setReportDialogOpen(false);
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to submit report", {
+          position: toast.POSITION.TOP_CENTER,
+          autoClose: 2000,
+          hideProgressBar: true,
+          transition: toast.slideIn,
+        });
+      }
+    },
+    [postId, reportTitle, reportContent]
+  );
+
   return (
     <div className="hiking-post">
-      <button className="post-options">
-        <img
-          src="/img/optionsIcon.png"
-          alt="options icon"
-          onClick={handleOptionClick}
-        />
+      <button className="post-options" onClick={handleOptionClick}>
+        <img src="/img/optionsIcon.png" alt="options icon" />
       </button>
       {optionDropdownOpen && (
         <ul className="options-option-list">
@@ -201,15 +291,18 @@ const HikingPostDetails = ({
       )}
       {editDialogOpen && (
         <div className="dark-overlay">
-          <div ref={dialogRef}>
-            <HikingPostForm
-              onCancel={handleDialogClose}
-              onSubmit={handleFormSubmit}
+          <div ref={editFormRef}>
+            <HikingForm
+              onCancel={handleEditDialogClose}
+              onSubmit={handleEditFormSubmit}
               handleTitleChange={handleTitleChange}
               handleContentChange={handleContentChange}
               handleImageChange={handleImageChange}
               formTitle="Edit Post"
               leftBtn="Edit"
+              contentPlaceholder="Enter new content text for your post (Required)"
+              isUploadOpen={true}
+              dialogRef={editFormRef} // Pass the ref to the HikingForm component
             />
           </div>
         </div>
@@ -279,10 +372,27 @@ const HikingPostDetails = ({
             </ul>
           )}
 
-          <button className="report-button">
+          <button className="report-button" onClick={handleReportButtonClick}>
             <img src="/img/reportIcon.png" alt="report icon" />
             <span>Report</span>
           </button>
+          {reportDialogOpen && (
+            <div className="dark-overlay">
+              <div ref={reportFormRef}>
+                <HikingForm
+                  onCancel={handleReportDialogClose}
+                  onSubmit={handleReportFormSubmit}
+                  handleTitleChange={handleReportTitleChange}
+                  handleContentChange={handleReportContentChange}
+                  formTitle="Report Post"
+                  leftBtn="Report"
+                  contentPlaceholder="Enter valid reasons for your report (Required)"
+                  isUploadOpen={false}
+                  dialogRef={reportFormRef} // Pass the ref to the HikingForm component
+                />
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

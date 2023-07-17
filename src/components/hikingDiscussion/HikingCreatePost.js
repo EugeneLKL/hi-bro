@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import HikingPostForm from "../common/HikingPostForm";
+import HikingForm from "../common/HikingForm";
 import "react-toastify/dist/ReactToastify.css";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -121,7 +121,7 @@ const HikingCreatePost = ({ profileImage }) => {
       {isDialogOpen && (
         <div className="dark-overlay">
           <div ref={dialogRef}>
-            <HikingPostForm
+            <HikingForm
               onCancel={handleDialogClose}
               onSubmit={handleFormSubmit}
               handleTitleChange={handleTitleChange}
@@ -129,6 +129,8 @@ const HikingCreatePost = ({ profileImage }) => {
               handleImageChange={handleImageChange}
               formTitle="Create Post"
               leftBtn="Post"
+              contentPlaceholder="Enter content text for your post (Required)"
+              isUploadOpen={true}
             />
           </div>
         </div>

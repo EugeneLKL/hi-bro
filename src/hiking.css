@@ -76,8 +76,8 @@
 }
 
 .sort-post-box-button {
-  background-color: #ffffff;
-  color: #000000;
+  background-color: #f9f9f9;
+  color: black;
   font-weight: bold;
   border: none;
   padding: 8px 12px;
@@ -86,10 +86,11 @@
   cursor: pointer;
   display: flex;
   align-items: center;
-  transition: background-color 0.3s, color 0.3s;
+  transition: background-color 0.3s;
 }
 
-.sort-post-box-button:hover {
+.sort-post-box-button:hover, .sort-post-box-button:hover span{
+  transition: background-color 0.3s;
   background-color: #008000;
   color: #fff;
 }
@@ -213,13 +214,13 @@
 }
 
 /* ---------------------------------------------------------- */
-/* hikingPostForm.js */
+/* hikingForm.js */
 /* ---------------------------------------------------------- */
-.post-form h2 {
+.hiking-discussion-form h2 {
   padding: 10px 15px;
 }
 
-.post-form {
+.hiking-discussion-form {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -278,12 +279,12 @@ button {
   cursor: pointer;
 }
 
-.form-post-button {
+.form-hiking-discussion-button {
   background-color: #007bff;
   color: #fff;
 }
 
-.form-post-button:hover {
+.form-hiking-discussion-button:hover {
   background-color: #0056b3;
 }
 
@@ -381,7 +382,7 @@ button {
   background: none;
   cursor: pointer;
   position: absolute;
-  margin-left: 630px;
+  margin-left: 620px;
 }
 
 .share-button,

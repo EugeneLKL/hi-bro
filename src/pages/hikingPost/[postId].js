@@ -5,6 +5,7 @@ import HikingPostComments from "../../components/hikingPost/HikingPostComments";
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { ToastContainer } from "react-toastify";
 
 const PostPage = () => {
   const { postId } = useParams();
@@ -82,6 +83,7 @@ const PostPage = () => {
         <h2>Comments</h2>
         <HikingPostComments postId={postId} comments={comments}/>
       </div>
+      <ToastContainer />
     </div>
   );
 };
