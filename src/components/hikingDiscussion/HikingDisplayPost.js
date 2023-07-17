@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-// TODO - Add username
+//TODO - Add username
 const HikingPost = ({ title, content, imageUrl, postId }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const username = "Steve";

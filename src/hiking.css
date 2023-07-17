@@ -5,10 +5,11 @@
 .hiking-create-post {
   display: flex;
   align-items: center;
-  border: 1px solid black;
+  border: 1px solid #ccc;
   border-radius: 10px;
   padding: 10px;
   margin-top: 10px;
+  background-color: #f9f9f9;
 }
 
 .profile-picture {
@@ -16,6 +17,7 @@
   height: 40px;
   border-radius: 50%;
   margin-right: 10px;
+  object-fit: cover;
 }
 
 .create-post-box-button {
@@ -23,11 +25,16 @@
   color: #fff;
   font-weight: bold;
   border: none;
-  padding: 10px 20px;
+  padding: 12px 24px;
   text-align: start;
   width: 650px;
   border-radius: 10px;
   cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.create-post-box-button:hover {
+  background-color: #006400;
 }
 
 .dark-overlay {
@@ -41,43 +48,56 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 98;
 }
 
 .dialog-content {
   background-color: #fff;
   padding: 20px;
-  border-radius: 4px;
+  border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  max-width: 500px;
 }
 
 /* ---------------------------------------------------------- */
-/* hikingFilterPost.js */
+/* hikingSortPost.js */
 /* ---------------------------------------------------------- */
-.hiking-filter-post {
+.hiking-sort-post {
   display: flex;
-  align-items: center;
-  border: 1px solid black;
+  border: 1px solid #ccc;
   border-radius: 10px;
   padding: 10px;
   margin-top: 10px;
+  background-color: #f9f9f9;
 }
 
-.filter-post-box-button {
+.hiking-sort-post span {
+  display: flex;
+  align-items: center;
+}
+
+.sort-post-box-button {
   background-color: #ffffff;
   color: #000000;
   font-weight: bold;
   border: none;
-  padding: 10px 20px;
+  padding: 8px 12px;
   text-align: start;
-  width: 130px;
   border-radius: 10px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s, color 0.3s;
 }
 
-.filter-post-box-button:hover {
+.sort-post-box-button:hover {
   background-color: #008000;
   color: #fff;
+}
+
+.sort-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
 }
 
 /* ---------------------------------------------------------- */
@@ -88,7 +108,7 @@
 }
 
 .hiking-post {
-  border: 1px solid black;
+  border: 1px solid #ccc;
   border-radius: 10px;
   background-color: #f9f9f9;
   margin-top: 10px;
@@ -96,6 +116,7 @@
   margin-bottom: 20px;
   text-align: start;
   max-width: 690px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .hiking-post-header {
@@ -105,18 +126,20 @@
 }
 
 .hiking-post-header h5 {
-  padding: 0;
+  margin: 0;
+  font-weight: bold;
 }
 
 .hiking-post-header img {
   width: 30px;
   height: 30px;
   margin-right: 15px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .hiking-post-username {
   font-weight: bold;
-  padding-bottom: 10px;
   text-decoration: none;
 }
 
@@ -137,11 +160,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
 .hiking-post img {
-  max-width: 650px;
-  max-height: 500px;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
 }
 
 .image-slider {
@@ -156,7 +181,7 @@
 .hiking-post-image {
   max-width: 100%;
   max-height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   transition: transform 0.3s;
 }
 
@@ -164,7 +189,7 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.6);
   color: white;
   font-size: 24px;
   padding: 8px;
@@ -198,88 +223,64 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  border: 1px solid black;
+  border: 1px solid #ccc;
   border-radius: 10px;
-  padding: 10px;
-  margin-top: 10px;
-  background: white;
+  padding: 20px;
+  margin-top: 20px;
+  background: #fff;
   width: 700px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .form-row {
   margin-bottom: 10px;
   padding-left: 15px;
-  width: 665px;
+  width: 680px;
 }
 
 label {
   font-weight: bold;
 }
 
-input {
+input[type="text"],
+textarea {
   width: 100%;
-  padding: 5px;
-  margin-left: 0;
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  box-sizing: border-box;
+  min-height: 35px;
+  max-height: 540px;
 }
 
-.form-row textarea {
-  resize: none;
-  max-height: 10em;
-  min-height: 5em;
+input[type="text"]:focus,
+textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
 
 .form-actions {
   display: flex;
   justify-content: flex-end;
-  margin-top: 10px;
+  margin-top: 20px;
 }
 
 button {
   margin-left: 10px;
-}
-
-#title,
-#content {
-  font-size: 1rem;
-  width: 100%;
-}
-
-.style-textarea {
-  width: 100%;
-  padding: 5px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  resize: vertical;
-}
-
-.style-textarea:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-}
-
-.style-input {
-  width: 100%;
-  padding: 5px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  resize: vertical;
-}
-
-.style-input:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-}
-
-.form-post-button {
   padding: 10px 20px;
   font-size: 16px;
   border: none;
   border-radius: 4px;
+  cursor: pointer;
+}
+
+.form-post-button {
   background-color: #007bff;
   color: #fff;
-  cursor: pointer;
 }
 
 .form-post-button:hover {
@@ -291,14 +292,8 @@ button {
 }
 
 .form-cancel-button {
-  padding: 10px 20px;
-  font-size: 16px;
-  margin-right: -11px;
-  border: none;
-  border-radius: 4px;
   background-color: #ff0000;
   color: #fff;
-  cursor: pointer;
 }
 
 .form-cancel-button:hover {
@@ -311,7 +306,11 @@ button {
 
 .upload-button {
   margin-left: 10px;
+  width: 200px;
+  padding: 8px 6px;
+  margin-right: 290px;
 }
+
 
 /* hikingPost */
 /* ---------------------------------------------------------- */
@@ -329,16 +328,42 @@ button {
 .vote-count {
   margin: 10px;
   min-width: 80px;
+  font-weight: bold;
+  color: #333;
 }
 
 #down {
   transform: rotate(180deg);
 }
 
-.voteUp, .voteDown {
+.voteUp,
+.voteDown {
   border: none;
   background: none;
   cursor: pointer;
+  padding: 5px;
+  transition: color 0.3s;
+}
+
+.voteUp:hover,
+.voteDown:hover {
+  color: #007bff;
+}
+
+.voteUp:focus,
+.voteDown:focus {
+  outline: none;
+}
+
+.voteUp svg,
+.voteDown svg {
+  width: 24px;
+  height: 24px;
+}
+
+.voteUp.active,
+.voteDown.active {
+  color: #007bff;
 }
 
 /* ---------------------------------------------------------- */
@@ -359,7 +384,8 @@ button {
   margin-left: 630px;
 }
 
-.share-button, .report-button {
+.share-button,
+.report-button {
   border: none;
   background: none;
   display: flex;
@@ -368,12 +394,14 @@ button {
   cursor: pointer;
 }
 
-.share-button span, .report-button span {
+.share-button span,
+.report-button span {
   font-size: 1.2em;
   padding-left: 5px;
 }
 
-.share-button img, .report-button img {
+.share-button img,
+.report-button img {
   width: 20px;
   height: 20px;
 }
@@ -417,16 +445,19 @@ button {
   align-items: center;
 }
 
-.share-option-list li, .options-option-list li {
+.share-option-list li,
+.options-option-list li {
   padding: 8px 16px;
   cursor: pointer;
 }
 
-.share-option-list li:hover, .options-option-list li:hover {
+.share-option-list li:hover,
+.options-option-list li:hover {
   background-color: #f0f0f0;
 }
 
-.share-icon, .option-icon {
+.share-icon,
+.option-icon {
   width: 20px;
   margin-right: 7px;
   transform: translateY(3px);
@@ -442,7 +473,7 @@ button {
   align-items: center;
 }
 
-.comment-form .comment-input{
+.comment-form .comment-input {
   margin: 10px;
   resize: none;
   min-height: 5em;
@@ -492,7 +523,6 @@ button {
 .comment-header {
   display: flex;
   align-items: center;
-
 }
 
 .comment-username {

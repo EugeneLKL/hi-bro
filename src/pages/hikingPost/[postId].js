@@ -15,16 +15,10 @@ const PostPage = () => {
 
   const username = "Steve";
 
-  const handleDelete = async (postId) => {
+  const handleDelete = async () => {
     try {
-      // Send a DELETE request to the server
-      const response = await axios.delete(`/api/posts/${postId}`);
-      // Handle success or show a success message
-      console.log("Post deleted:", response.data);
-      // Update the posts state to remove the deleted post
-      setPosts((prevPosts) =>
-        prevPosts.filter((post) => post.postId !== postId)
-      );
+      // Send a DELETE request to the server using the postId from the URL
+      await axios.delete(`/api/posts/${postId}`);
       // Redirect to the main page
       navigate("/");
     } catch (error) {
@@ -44,10 +38,10 @@ const PostPage = () => {
         // Handle the error or display an error message
       }
     };
-    if (posts === undefined) {
-      fetchPosts();
-    }
-  }, [postId, posts]);
+
+    fetchPosts();
+
+  }, [postId]);
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -60,10 +54,11 @@ const PostPage = () => {
         // Handle the error or display an error message
       }
     };
-    if (comments === undefined) {
+
+    if (postId) {
       fetchComments();
     }
-  }, [postId, comments]);
+  }, [postId]);
 
   return (
     <div className="main-content">

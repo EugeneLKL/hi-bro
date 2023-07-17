@@ -56,7 +56,7 @@ const HikingVote = ({ postId }) => {
           onClick={voteUp}
         />
       </button>
-      <div className="vote-count">{voteCounter === null ? 0 : voteCounter}</div>
+      <div className="vote-count">{voteCounter}</div>
       <button className="voteDown">
         <img
           src="/img/voteArrowIcon.png"

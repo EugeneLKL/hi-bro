@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const SearchBar = ({setPosts}) => {
+const SearchBar = ({ setPosts }) => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleInputChange = (event) => {
@@ -14,25 +14,36 @@ const SearchBar = ({setPosts}) => {
       if (!searchTerm) {
         return;
       }
-
+  
       console.log("Performing search for:", searchTerm);
-
+  
       const response = await axios.get("/api/search", {
-        params: { title: searchTerm },
+        params: { query: searchTerm },
       });
-
-      // Handle the search results from the database
+  
+      // Handle the search results from the API
       const searchResults = response.data;
       console.log("Search Results:", searchResults);
+  
+      setPosts(searchResults);
+  
+      // Update the URL with the search query
+      // const searchUrl = `/search/?q=${encodeURIComponent(searchTerm)}`;
+      // window.history.pushState({ searchTerm }, "", searchUrl);
 
-      setPosts(searchResults)
+      // Update URL with the search query and makes me can retrieve the search query in the url
+      const searchUrl = `/search/?q=${encodeURIComponent(searchTerm)}`;
+      window.history.pushState({ searchTerm }, "", searchUrl);
+  
       // Clear the search term after performing the search
       setSearchTerm("");
-
     } catch (error) {
       console.error("Error occurred during search:", error);
     }
   };
+
+  // re render page with all post when not searching
+  
 
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
