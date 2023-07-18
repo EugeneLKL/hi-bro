@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import HikingForm from "../common/HikingForm";
+import Confirmation from "../common/Confirmation";
 import "react-toastify/dist/ReactToastify.css";
 import { toast } from "react-toastify";
 import axios from "axios";
 
 const HikingCreatePost = ({ profileImage }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const dialogRef = useRef(null);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -36,31 +38,31 @@ const HikingCreatePost = ({ profileImage }) => {
   const handleFormSubmit = async (event) => {
     event.preventDefault();
 
+    if (!isConfirmationOpen) {
+      setIsConfirmationOpen(true);
+      return;
+    }
+
     try {
       const formData = new FormData();
 
-      // Append all images to the form data without a unique name
       images.forEach((image) => {
         formData.append("images", image);
       });
 
-      // Upload the images to the backend
       const uploadResponse = await axios.post("/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
 
-      const imageUrl = uploadResponse.data.imageUrl; // Get the URLs of the uploaded images
+      const imageUrl = uploadResponse.data.imageUrl;
 
-      // Create a new post with the image URLs
       const newPostData = { title, content, imageUrl };
       const response = await axios.post("/api/posts", newPostData);
 
-      // Handle the response or perform additional actions
       console.log("New post created:", response.data);
 
-      // Show toast message
       toast.success("Post created successfully", {
         position: toast.POSITION.TOP_CENTER,
         autoClose: 2000,
@@ -68,20 +70,15 @@ const HikingCreatePost = ({ profileImage }) => {
         transition: toast.slideIn,
       });
 
-      // Reset the form fields
       setTitle("");
       setContent("");
-
-      // Close the dialog box
       handleDialogClose();
 
-      // Reload the page
       setTimeout(function () {
         window.location.reload();
       }, 2000);
     } catch (error) {
       console.error(error);
-      // Handle the error or display an error message
       toast.error("Failed to create post", {
         position: toast.POSITION.TOP_CENTER,
         autoClose: 2000,
@@ -91,12 +88,13 @@ const HikingCreatePost = ({ profileImage }) => {
     }
   };
 
-  const handleButtonClick = () => {
+  const handlePostButtonClick = () => {
     setIsDialogOpen(true);
   };
 
   const handleDialogClose = () => {
     setIsDialogOpen(false);
+    setIsConfirmationOpen(false);
   };
 
   const handleTitleChange = (event) => {
@@ -115,10 +113,17 @@ const HikingCreatePost = ({ profileImage }) => {
   return (
     <div className="hiking-create-post">
       <img className="profile-picture" src={profileImage} alt="User profile" />
-      <button className="create-post-box-button" onClick={handleButtonClick}>
+      <button className="create-post-box-button" onClick={handlePostButtonClick}>
         Create Post
       </button>
-      {isDialogOpen && (
+      {isConfirmationOpen && (
+        <Confirmation
+          message="Are you sure you want to post?"
+          onCancel={handleDialogClose}
+          onConfirm={handleFormSubmit}
+        />
+      )}
+      {isDialogOpen && !isConfirmationOpen && (
         <div className="dark-overlay">
           <div ref={dialogRef}>
             <HikingForm

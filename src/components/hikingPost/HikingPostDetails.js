@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import { FaFacebook, FaInstagram, FaLink } from "react-icons/fa";
 import { MdDelete, MdEdit } from "react-icons/md";
 import HikingForm from "../common/HikingForm";
-import ConfirmationModal from "../common/Confirmation";
+import Confirmation from "../common/Confirmation";
 import { toast } from "react-toastify";
 import axios from "axios";
 
@@ -19,6 +19,8 @@ const HikingPostDetails = ({
   const [shareDropdownOpen, setShareDropdownOpen] = useState(false);
   const [optionDropdownOpen, setOptionDropdownOpen] = useState(false);
   const [showModalDelete, setShowModalDelete] = useState(false);
+  const [showModalEdit, setShowModalEdit] = useState(false);
+  const [showModalReport, setShowModalReport] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [reportTitle, setReportTitle] = useState("");
@@ -106,63 +108,69 @@ const HikingPostDetails = ({
   const [newContent, setNewContent] = useState("");
   const [images, setImages] = useState([]);
 
-  const handleEditFormSubmit = useCallback(
-    async (event) => {
-      event.preventDefault();
+  const handleEditFormSubmit = async (event) => {
+    event.preventDefault();
 
-      try {
-        const formData = new FormData();
+    if (!showModalEdit) {
+      setShowModalEdit(true);
+      return;
+    }
 
-        images.forEach((image) => {
-          formData.append("images", image);
-        });
+    try {
+      const formData = new FormData();
 
-        const uploadResponse = await axios.post("/upload", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+      images.forEach((image) => {
+        formData.append("images", image);
+      });
 
-        const imageUrl = uploadResponse.data.imageUrl;
-        const newPostData = {
-          title: newTitle,
-          content: newContent,
-          imageUrl,
-        };
-        const response = await axios.patch(`/api/posts/${postId}`, newPostData);
+      const uploadResponse = await axios.post("/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-        console.log("Post edited:", response.data);
+      const imageUrl = uploadResponse.data.imageUrl;
+      const newPostData = {
+        title: newTitle,
+        content: newContent,
+        imageUrl,
+      };
+      const response = await axios.patch(`/api/posts/${postId}`, newPostData);
 
-        toast.success("Post edited", {
-          position: toast.POSITION.TOP_CENTER,
-          autoClose: 2000,
-          hideProgressBar: true,
-          transition: toast.slideIn,
-        });
+      console.log("Post edited:", response.data);
 
-        // add delaytime to reload page
-        setTimeout(() => {
-          window.location.reload();
-        }, 3000);
-      } catch (error) {
-        console.error(error);
-        toast.error("Failed to edit post", {
-          position: toast.POSITION.TOP_CENTER,
-          autoClose: 2000,
-          hideProgressBar: true,
-          transition: toast.slideIn,
-        });
-      }
-    },
-    [images, postId, newTitle, newContent]
-  );
+      toast.success("Post edited successfully", {
+        position: toast.POSITION.TOP_CENTER,
+        autoClose: 2000,
+        hideProgressBar: true,
+        transition: toast.slideIn,
+      });
+
+      handleEditDialogClose();
+
+      // add delaytime to reload page
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to edit post", {
+        position: toast.POSITION.TOP_CENTER,
+        autoClose: 2000,
+        hideProgressBar: true,
+        transition: toast.slideIn,
+      });
+    }
+  };
 
   const handleEditDialogClose = useCallback(() => {
     setEditDialogOpen(false);
+    setShowModalEdit(false);
   }, []);
 
   const handleReportDialogClose = useCallback(() => {
     setReportDialogOpen(false);
+    setShowModalReport(false);
   }, []);
 
   const handleTitleChange = useCallback((event) => {
@@ -236,41 +244,43 @@ const HikingPostDetails = ({
     setReportContent(event.target.value);
   }, []);
 
-  const handleReportFormSubmit = useCallback(
-    async (event) => {
-      event.preventDefault();
+  const handleReportFormSubmit = async (event) => {
+    event.preventDefault();
 
-      try {
-        const newReportData = {
-          title: reportTitle,
-          content: reportContent,
-        };
+    if (!showModalReport) {
+      setShowModalReport(true);
+      return;
+    }
 
-        const response = await axios.post(
-          `/api/posts/${postId}/report`,
-          newReportData
-        );
+    try {
+      const newReportData = {
+        title: reportTitle,
+        content: reportContent,
+      };
 
-        toast.success("Report submitted", {
-          position: toast.POSITION.TOP_CENTER,
-          autoClose: 2000,
-          hideProgressBar: true,
-          transition: toast.slideIn,
-        });
+      const response = await axios.post(
+        `/api/posts/${postId}/report`,
+        newReportData
+      );
 
-        setReportDialogOpen(false);
-      } catch (error) {
-        console.error(error);
-        toast.error("Failed to submit report", {
-          position: toast.POSITION.TOP_CENTER,
-          autoClose: 2000,
-          hideProgressBar: true,
-          transition: toast.slideIn,
-        });
-      }
-    },
-    [postId, reportTitle, reportContent]
-  );
+      toast.success("Report submitted", {
+        position: toast.POSITION.TOP_CENTER,
+        autoClose: 2000,
+        hideProgressBar: true,
+        transition: toast.slideIn,
+      });
+
+      handleReportDialogClose();
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to submit report", {
+        position: toast.POSITION.TOP_CENTER,
+        autoClose: 2000,
+        hideProgressBar: true,
+        transition: toast.slideIn,
+      });
+    }
+  }
 
   return (
     <div className="hiking-post">
@@ -289,7 +299,14 @@ const HikingPostDetails = ({
           </li>
         </ul>
       )}
-      {editDialogOpen && (
+      {showModalEdit && (
+        <Confirmation
+          message="Are you sure you want to edit?"
+          onCancel={handleEditDialogClose}
+          onConfirm={handleEditFormSubmit}
+        />
+      )}
+      {editDialogOpen && !showModalEdit && (
         <div className="dark-overlay">
           <div ref={editFormRef}>
             <HikingForm
@@ -302,7 +319,7 @@ const HikingPostDetails = ({
               leftBtn="Edit"
               contentPlaceholder="Enter new content text for your post (Required)"
               isUploadOpen={true}
-              dialogRef={editFormRef} // Pass the ref to the HikingForm component
+              dialogRef={editFormRef} 
             />
           </div>
         </div>
@@ -376,7 +393,14 @@ const HikingPostDetails = ({
             <img src="/img/reportIcon.png" alt="report icon" />
             <span>Report</span>
           </button>
-          {reportDialogOpen && (
+          {showModalReport && (
+            <Confirmation
+              message="Are you sure you want to report?"
+              onCancel={handleReportDialogClose}
+              onConfirm={handleReportFormSubmit}
+            />
+          )}
+          {reportDialogOpen && !showModalReport && (
             <div className="dark-overlay">
               <div ref={reportFormRef}>
                 <HikingForm
@@ -388,7 +412,7 @@ const HikingPostDetails = ({
                   leftBtn="Report"
                   contentPlaceholder="Enter valid reasons for your report (Required)"
                   isUploadOpen={false}
-                  dialogRef={reportFormRef} // Pass the ref to the HikingForm component
+                  dialogRef={reportFormRef} 
                 />
               </div>
             </div>

@@ -1,4 +1,8 @@
-import { AiOutlineStar, AiOutlineFire, AiOutlineClockCircle } from "react-icons/ai";
+import {
+  AiOutlineStar,
+  AiOutlineFire,
+  AiOutlineClockCircle,
+} from "react-icons/ai";
 import { useState } from "react";
 
 const HikingSortPost = ({ onSortChange }) => {
@@ -23,27 +27,39 @@ const HikingSortPost = ({ onSortChange }) => {
 
   return (
     <div className="hiking-sort-post">
-      <button
-        className={`sort-post-box-button ${selectedSort === "new" ? "active" : ""}`}
-        onClick={sortByNewest}
-      >
-        <AiOutlineStar className="sort-icon" />
-        <span>New</span>
-      </button>
-      <button
-        className={`sort-post-box-button ${selectedSort === "old" ? "active" : ""}`}
-        onClick={sortByOldest}
-      >
-        <AiOutlineClockCircle className="sort-icon" />
-        <span>Old</span>
-      </button>
-      <button
-        className={`sort-post-box-button ${selectedSort === "hot" ? "active" : ""}`}
-        onClick={sortByHot}
-      >
-        <AiOutlineFire className="sort-icon" />
-        <span>Hot</span>
-      </button>
+      <div className="sort-button">
+        <button
+          className={`sort-post-box-button ${
+            selectedSort === "new" ? "active" : ""
+          }`}
+          onClick={sortByNewest}
+        >
+          <AiOutlineStar className="sort-icon" />
+          New
+        </button>
+      </div>
+      <div className="sort-button">
+        <button
+          className={`sort-post-box-button ${
+            selectedSort === "old" ? "active" : ""
+          }`}
+          onClick={sortByOldest}
+        >
+          <AiOutlineClockCircle className="sort-icon" />
+          Old
+        </button>
+      </div>
+      <div className="sort-button">
+        <button
+          className={`sort-post-box-button ${
+            selectedSort === "hot" ? "active" : ""
+          }`}
+          onClick={sortByHot}
+        >
+          <AiOutlineFire className="sort-icon" />
+          Hot
+        </button>
+      </div>
     </div>
   );
 };

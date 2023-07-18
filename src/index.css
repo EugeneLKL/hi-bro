@@ -133,6 +133,8 @@ body {
   align-items: center;
   padding: 10px 0px;
   border-bottom: 1px solid #f2f2f2;
+  width: 350px;
+  margin: 0 auto;
 }
 
 .search-input {

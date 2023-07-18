@@ -86,11 +86,10 @@
   cursor: pointer;
   display: flex;
   align-items: center;
-  transition: background-color 0.3s;
 }
 
-.sort-post-box-button:hover, .sort-post-box-button:hover span{
-  transition: background-color 0.3s;
+.sort-button:hover button{
+  transition: color 0.1s, background-color 0.5s;
   background-color: #008000;
   color: #fff;
 }
@@ -216,10 +215,6 @@
 /* ---------------------------------------------------------- */
 /* hikingForm.js */
 /* ---------------------------------------------------------- */
-.hiking-discussion-form h2 {
-  padding: 10px 15px;
-}
-
 .hiking-discussion-form {
   display: flex;
   flex-direction: column;
@@ -231,6 +226,11 @@
   background: #fff;
   width: 700px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 98;
+}
+
+.hiking-discussion-form h2 {
+  padding: 10px 15px;
 }
 
 .form-row {
