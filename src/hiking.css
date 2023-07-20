@@ -105,6 +105,13 @@
 /* ---------------------------------------------------------- */
 .post-link {
   text-decoration: none;
+  width: 100%;
+}
+
+.hiking-post-container {
+  display: flex;
+  width: auto;
+  margin-right: 0px;
 }
 
 .hiking-post {
@@ -115,7 +122,6 @@
   padding: 20px;
   margin-bottom: 20px;
   text-align: start;
-  max-width: 690px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
@@ -317,12 +323,11 @@ button {
 /* ---------------------------------------------------------- */
 /* hikingVote.js */
 /* ---------------------------------------------------------- */
-.hiking-post-vote {
+/* .hiking-post-vote {
   display: flex;
   flex-direction: row;
   align-items: center;
   margin-right: 10px;
-  width: 690px;
   margin-top: 10px;
 }
 
@@ -365,7 +370,7 @@ button {
 .voteUp.active,
 .voteDown.active {
   color: #007bff;
-}
+} */
 
 /* ---------------------------------------------------------- */
 /* hikingPostDetails.js */
