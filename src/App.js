@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import NavBar from "./components/common/NavBar";
 import SideBar from "./components/common/SideBar";
 import PostPage from "./pages/hikingPost/[postId]";
+import HikingTrails from "./pages/hikingTrails";
 
 function App() {
 
@@ -14,8 +15,11 @@ function App() {
         <div className="content-container">
           <SideBar />
           <Routes>
-            <Route path="/" element={<HikingDiscussion />} />
+            <Route path="/hikingDiscussion" element={<HikingDiscussion />} />
             <Route path="/hikingPost/:postId" element={<PostPage />}/>
+          </Routes>
+          <Routes>
+            <Route path="/hikingTrails" element={<HikingTrails />} />
           </Routes>
         </div>
       </div>
