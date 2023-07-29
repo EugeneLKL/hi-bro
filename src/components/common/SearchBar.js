@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { SearchOutlined } from "@ant-design/icons";
 
 const SearchBar = ({ setPosts }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -62,7 +63,7 @@ const SearchBar = ({ setPosts }) => {
         onKeyDown={handleKeyDown}
       />
       <button className="search-button" onClick={handleSearch}>
-        <img src="/img/searchIcon.png" alt="search icon" />
+        <SearchOutlined />
       </button>
     </div>
   );

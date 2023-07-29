@@ -53,8 +53,6 @@ const HikingDiscussion = () => {
     }
   }, [posts]);
 
-  //useEffect rerender page 
-
   return (
     <div className="main-content">
       <div className="centered-content">

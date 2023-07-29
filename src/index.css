@@ -133,33 +133,41 @@ body {
   align-items: center;
   padding: 10px 0px;
   border-bottom: 1px solid #f2f2f2;
-  width: 350px;
+  width: 400px; 
   margin: 0 auto;
 }
 
 .search-input {
-  padding: 7px;
+  padding: 10px;
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  width: 300px;
+  width: 280px;
   max-width: 100%;
+  background-color: #fff;
+}
+
+.search-input:hover,
+.search-input:focus {
+  border-color: #8f8f8f;
 }
 
 .search-button {
   background-color: #8f8f8f;
   color: #fff;
   border: none;
-  padding: 7px 15px;
+  padding: 10px 20px; 
   font-size: 16px;
   border-radius: 4px;
+  margin-top: 5px;
   margin-left: 10px;
   cursor: pointer;
+  transition: background-color 0.2s ease; 
 }
 
-.search-button img {
-  width: 15px;
-  height: 15px;
+/* Added a hover effect for the button */
+.search-button:hover {
+  background-color: #6b6b6b;
 }
 
 /* ---------------------------------------------------------- */

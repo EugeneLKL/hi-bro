@@ -1,10 +1,45 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { FaFacebook, FaInstagram, FaLink } from "react-icons/fa";
-import { MdDelete, MdEdit } from "react-icons/md";
 import HikingForm from "../common/HikingForm";
 import Confirmation from "../common/Confirmation";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { ShareAltOutlined, StopOutlined, EllipsisOutlined, EditOutlined, DeleteOutlined, FacebookOutlined, InstagramOutlined, LinkOutlined } from "@ant-design/icons";
+import styled from "styled-components";
+
+const ShareIcon = styled(ShareAltOutlined)`
+  margin-right: 10px;
+`;
+
+const StopIcon = styled(StopOutlined)`
+  margin-right: 10px;
+`;
+
+const OptionIcon = styled(EllipsisOutlined)`
+  margin-right: 10px;
+  transform: rotate(90deg) translateX(-5px);
+  font-size: 20px;
+  font-weight: bold;
+`;
+
+const EditIcon = styled(EditOutlined)`
+  margin-right: 10px;
+`;
+
+const DeleteIcon = styled(DeleteOutlined)`
+  margin-right: 10px;
+`;
+
+const FacebookIcon = styled(FacebookOutlined)`
+  margin-right: 10px;
+`;  
+
+const InstagramIcon = styled(InstagramOutlined)`
+  margin-right: 10px;
+`;
+
+const LinkIcon = styled(LinkOutlined)`
+  margin-right: 10px;
+`;
 
 const HikingPostDetails = ({
   postId,
@@ -285,16 +320,16 @@ const HikingPostDetails = ({
   return (
     <div className="hiking-post">
       <button className="post-options" onClick={handleOptionClick}>
-        <img src="/img/optionsIcon.png" alt="options icon" />
+        <OptionIcon />
       </button>
       {optionDropdownOpen && (
         <ul className="options-option-list">
           <li onClick={handleEditButtonClick}>
-            <MdEdit className="option-icon" />
+            <EditIcon />
             <span>Edit</span>
           </li>
           <li onClick={handleDeleteButtonClick}>
-            <MdDelete className="option-icon" />
+            <DeleteIcon />
             <span>Delete</span>
           </li>
         </ul>
@@ -325,7 +360,7 @@ const HikingPostDetails = ({
         </div>
       )}
       {showModalDelete && (
-        <ConfirmationModal
+        <Confirmation
           message="Are you sure you want to delete?"
           onConfirm={handleConfirmDelete}
           onCancel={handleCancel}
@@ -369,28 +404,28 @@ const HikingPostDetails = ({
       {isDetail && (
         <div className="post-buttons">
           <button className="share-button" onClick={handleShareClick}>
-            <img src="/img/shareIcon.png" alt="share icon" />
+            <ShareIcon />
             <span>Share</span>
           </button>
           {shareDropdownOpen && (
             <ul className="share-option-list">
               <li onClick={shareFacebook}>
-                <FaFacebook className="share-icon" />
+                <FacebookIcon />
                 <span>Facebook</span>
               </li>
               <li onClick={shareInstagram}>
-                <FaInstagram className="share-icon" />
+                <InstagramIcon />
                 <span>Instagram</span>
               </li>
               <li onClick={shareLink}>
-                <FaLink className="share-icon" />
+                <LinkIcon />
                 <span>Link</span>
               </li>
             </ul>
           )}
 
           <button className="report-button" onClick={handleReportButtonClick}>
-            <img src="/img/reportIcon.png" alt="report icon" />
+            <StopIcon />
             <span>Report</span>
           </button>
           {showModalReport && (

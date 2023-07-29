@@ -77,6 +77,7 @@ const HikingCreatePost = ({ profileImage }) => {
       setTimeout(function () {
         window.location.reload();
       }, 2000);
+
     } catch (error) {
       console.error(error);
       toast.error("Failed to create post", {
@@ -113,7 +114,10 @@ const HikingCreatePost = ({ profileImage }) => {
   return (
     <div className="hiking-create-post">
       <img className="profile-picture" src={profileImage} alt="User profile" />
-      <button className="create-post-box-button" onClick={handlePostButtonClick}>
+      <button
+        className="create-post-box-button"
+        onClick={handlePostButtonClick}
+      >
         Create Post
       </button>
       {isConfirmationOpen && (

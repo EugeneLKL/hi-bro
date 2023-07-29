@@ -88,17 +88,12 @@
   align-items: center;
 }
 
-.sort-button:hover button{
+.sort-post-box-button:hover {
   transition: color 0.1s, background-color 0.5s;
   background-color: #008000;
   color: #fff;
 }
 
-.sort-icon {
-  width: 20px;
-  height: 20px;
-  margin-right: 10px;
-}
 
 /* ---------------------------------------------------------- */
 /* hikingDisplayPost.js */
@@ -318,60 +313,7 @@ button {
   margin-right: 290px;
 }
 
-
 /* hikingPost */
-/* ---------------------------------------------------------- */
-/* hikingVote.js */
-/* ---------------------------------------------------------- */
-/* .hiking-post-vote {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  margin-right: 10px;
-  margin-top: 10px;
-}
-
-.vote-count {
-  margin: 10px;
-  min-width: 80px;
-  font-weight: bold;
-  color: #333;
-}
-
-#down {
-  transform: rotate(180deg);
-}
-
-.voteUp,
-.voteDown {
-  border: none;
-  background: none;
-  cursor: pointer;
-  padding: 5px;
-  transition: color 0.3s;
-}
-
-.voteUp:hover,
-.voteDown:hover {
-  color: #007bff;
-}
-
-.voteUp:focus,
-.voteDown:focus {
-  outline: none;
-}
-
-.voteUp svg,
-.voteDown svg {
-  width: 24px;
-  height: 24px;
-}
-
-.voteUp.active,
-.voteDown.active {
-  color: #007bff;
-} */
-
 /* ---------------------------------------------------------- */
 /* hikingPostDetails.js */
 /* ---------------------------------------------------------- */
@@ -392,35 +334,20 @@ button {
 
 .share-button,
 .report-button {
-  border: none;
-  background: none;
-  display: flex;
-  text-align: center;
-  align-items: center;
-  cursor: pointer;
-}
-
-.share-button span,
-.report-button span {
-  font-size: 1.2em;
-  padding-left: 5px;
-}
-
-.share-button img,
-.report-button img {
-  width: 20px;
-  height: 20px;
-}
-
-.share-button {
   display: flex;
   align-items: center;
-  color: #fff;
+  background-color: #f9f9f9;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   margin-left: 0;
-  padding: 0;
+  padding: 8px;
+  margin-right: 10px;
+}
+
+.share-button:hover,
+.report-button:hover {
+  background-color: #b1b1b1;
 }
 
 .share-button img {

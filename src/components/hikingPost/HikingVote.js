@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import styled from "styled-components";
+import { UpCircleOutlined, DownCircleOutlined } from "@ant-design/icons";
 
 const VoteContainer = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin-right: 10px;
   margin-top: 10px;
 `;
 
@@ -17,7 +17,7 @@ const VoteCount = styled.div`
   color: #333;
 `;
 
-const ArrowButton = styled.button`
+const UpArrowButton = styled(UpCircleOutlined)`
   border: none;
   background: none;
   cursor: pointer;
@@ -42,6 +42,33 @@ const ArrowButton = styled.button`
     color: #007bff;
   }
 `;
+
+const DownArrowButton = styled(DownCircleOutlined)`
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 5px;
+  transition: color 0.3s;
+  margin: 5px;
+
+  &:hover {
+    color: #007bff;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  &.active {
+    color: #007bff;
+  }
+`;
+
 
 const HikingVote = ({ postId, containerStyle }) => {
   const [voteCounter, setVoteCounter] = useState(null);
@@ -94,17 +121,9 @@ const HikingVote = ({ postId, containerStyle }) => {
 
   return (
     <StyledVoteContainer>
-      <ArrowButton className="voteUp" onClick={voteUp}>
-        <img src="/img/voteArrowIcon.png" alt="Up arrow" />
-      </ArrowButton>
+      <UpArrowButton onClick={voteUp} />
       <VoteCount>{voteCounter}</VoteCount>
-      <ArrowButton className="voteDown" onClick={voteDown} isRotate={true}>
-        <img
-          src="/img/voteArrowIcon.png"
-          alt="Down arrow"
-          style={{ transform: "rotate(180deg)" }}
-        />
-      </ArrowButton>
+      <DownArrowButton onClick={voteDown} />
     </StyledVoteContainer>
   );
 };
