@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import HikingForm from "../common/HikingForm";
-import Confirmation from "../common/Confirmation";
+import Confirmation from "../common/HikingConfirmation";
 import "react-toastify/dist/ReactToastify.css";
 import { toast } from "react-toastify";
 import axios from "axios";

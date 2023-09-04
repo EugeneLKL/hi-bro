@@ -100,6 +100,7 @@
 /* ---------------------------------------------------------- */
 .post-link {
   text-decoration: none;
+  color: black;
   width: 100%;
 }
 
@@ -400,10 +401,12 @@ button {
 /* hikingCreateComment.js */
 /* ---------------------------------------------------------- */
 .comment-form {
-  border: 1px solid black;
   border-radius: 10px;
   display: flex;
   align-items: center;
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .comment-form .comment-input {
@@ -432,6 +435,7 @@ button {
   border-radius: 10px;
   margin: 0;
   cursor: pointer;
+  margin-right: 10px;
 }
 
 .comment-form form {
@@ -443,7 +447,7 @@ button {
 /* hikingPostComments.js */
 /* ---------------------------------------------------------- */
 .comment {
-  border: 1px solid black;
+  border: 1px solid #ccc;
   border-radius: 10px;
   background-color: #f9f9f9;
   margin-top: 10px;
@@ -451,6 +455,7 @@ button {
   margin-bottom: 20px;
   text-align: start;
   max-width: 690px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .comment-header {
@@ -468,6 +473,7 @@ button {
 .comment-content {
   font-size: 0.9rem;
   margin-left: 50px;
+  margin-top: 10px;
 }
 
 .comment img {

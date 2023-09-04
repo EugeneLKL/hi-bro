@@ -1,6 +1,7 @@
 import styled, { keyframes } from "styled-components";
 import { SearchOutlined } from "@ant-design/icons";
 import { useState } from "react";
+import axios from "axios";
 
 const rotateBackground = keyframes`
   0% {
@@ -22,7 +23,7 @@ const rotateBackground = keyframes`
 
 const HikingSearchTrailsContainer = styled.div`
   width: 100%;
-  height: 485px;
+  height: 100%;
   animation: ${rotateBackground} 30s infinite;
   background-size: cover;
   background-position: center;
@@ -80,11 +81,62 @@ const SearchIcon = styled(SearchOutlined)`
   margin-right: 10px;
 `;
 
-const HikingSearchTrails = () => {
-  //TODO - add search bar functionality
+const HikingSearchTrails = ({setTrails}) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const handleInputChange = (value) => console.log(value);
-  const handleKeyDown = (value) => console.log(value);
+
+  const handleInputChange = (event) => {
+    const newSearchTerm = event.target.value;
+    setSearchTerm(newSearchTerm);
+  };
+
+  const handleSearch = async () => {
+    try {
+      if (!searchTerm) {
+        return;
+      }
+  
+      console.log("Performing search for:", searchTerm);
+  
+      const response = await axios.get("/api/trailSearch", {
+        params: { query: searchTerm },
+      });
+  
+      // Handle the search results from the API
+      const searchResults = response.data;
+      console.log("Search Results:", searchResults);
+  
+      setTrails(searchResults);
+
+      // Update URL with the search query and makes me can retrieve the search query in the url
+      const searchUrl = `/search/?q=${encodeURIComponent(searchTerm)}`;
+      window.history.pushState({ searchTerm }, "", searchUrl);
+
+      
+  
+      // Clear the search term after performing the search
+      setSearchTerm("");
+    } catch (error) {
+      console.error("Error occurred during search:", error);
+    }
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter" && searchTerm) {
+      handleSearch();
+    } else if (event.key === "Enter" && !searchTerm) {
+      setSearchTerm("");
+      window.location.href = "/hikingTrails";
+    }
+  };
+
+  const handleClickSearch = () => {
+    if (!searchTerm) {
+      setSearchTerm("");
+      window.location.href = "/hikingTrails";
+    } else {
+      handleSearch();
+    }
+  }
 
   return (
     <HikingSearchTrailsContainer>
@@ -102,7 +154,7 @@ const HikingSearchTrails = () => {
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
           />
-          <SearchButton>
+          <SearchButton onClick={handleClickSearch}>
             <SearchIcon />
             Search
           </SearchButton>

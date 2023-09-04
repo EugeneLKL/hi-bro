@@ -1,9 +1,16 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./src/components/hikingPost/HikingPostDetails.js"],
+  content: [
+    "./src/components/**/*.{js,jsx,ts,tsx}",
+    "./src/pages/**/*.{js,jsx,ts,tsx}",
+    "./App.js/*/.{js,jsx,ts,tsx}"
+  ],
   theme: {
     extend: {},
   },
   plugins: [],
+  corePlugins: {
+    preflight: false,
+  },
 }
 

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import Confirmation from "../common/Confirmation";
+import Confirmation from "../common/HikingConfirmation";
 
 const HikingCreateComment = ({ postId, profileImage }) => {
   const [comment, setComment] = useState("");

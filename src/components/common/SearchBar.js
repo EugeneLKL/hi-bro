@@ -43,9 +43,6 @@ const SearchBar = ({ setPosts }) => {
     }
   };
 
-  // re render page with all post when not searching
-  
-
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
       handleSearch();

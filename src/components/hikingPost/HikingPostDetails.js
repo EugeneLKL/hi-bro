@@ -1,9 +1,18 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import HikingForm from "../common/HikingForm";
-import Confirmation from "../common/Confirmation";
+import Confirmation from "../common/HikingConfirmation";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { ShareAltOutlined, StopOutlined, EllipsisOutlined, EditOutlined, DeleteOutlined, FacebookOutlined, InstagramOutlined, LinkOutlined } from "@ant-design/icons";
+import {
+  ShareAltOutlined,
+  StopOutlined,
+  EllipsisOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  FacebookOutlined,
+  InstagramOutlined,
+  LinkOutlined,
+} from "@ant-design/icons";
 import styled from "styled-components";
 
 const ShareIcon = styled(ShareAltOutlined)`
@@ -31,7 +40,7 @@ const DeleteIcon = styled(DeleteOutlined)`
 
 const FacebookIcon = styled(FacebookOutlined)`
   margin-right: 10px;
-`;  
+`;
 
 const InstagramIcon = styled(InstagramOutlined)`
   margin-right: 10px;
@@ -64,12 +73,16 @@ const HikingPostDetails = ({
   const editFormRef = useRef(null);
   const reportFormRef = useRef(null);
 
-  const handleOptionClick = () => {
-    setOptionDropdownOpen(!optionDropdownOpen);
+  const handleOptionClick = (e) => {
+    e.preventDefault();
+    setOptionDropdownOpen((prevState) => !prevState);
+    setShareDropdownOpen(false);
   };
+  
 
   const handleShareClick = () => {
-    setShareDropdownOpen(!shareDropdownOpen);
+    setShareDropdownOpen((prevState) => !prevState);
+    setOptionDropdownOpen(false); 
   };
 
   const handleCancel = useCallback(() => {
@@ -134,9 +147,16 @@ const HikingPostDetails = ({
     );
   }, []);
 
+  // share link should copy the link to clipboard
   const shareLink = useCallback((e) => {
     e.preventDefault();
     navigator.clipboard.writeText(window.location.href);
+    toast.success("Link copied to clipboard", {
+      position: toast.POSITION.TOP_CENTER,
+      autoClose: 2000,
+      hideProgressBar: true,
+      transition: toast.slideIn,
+    });
   }, []);
 
   const [newTitle, setNewTitle] = useState("");
@@ -249,7 +269,7 @@ const HikingPostDetails = ({
       setReportDialogOpen(false);
     }
 
-    if (!isShareDropdownClick && !isOptionDropdownClick) {
+    if (isShareDropdownClick && isOptionDropdownClick) {
       setOptionDropdownOpen(false);
       setShareDropdownOpen(false);
     }
@@ -298,6 +318,8 @@ const HikingPostDetails = ({
         newReportData
       );
 
+      console.log(response);
+
       toast.success("Report submitted", {
         position: toast.POSITION.TOP_CENTER,
         autoClose: 2000,
@@ -315,7 +337,7 @@ const HikingPostDetails = ({
         transition: toast.slideIn,
       });
     }
-  }
+  };
 
   return (
     <div className="hiking-post">
@@ -354,7 +376,7 @@ const HikingPostDetails = ({
               leftBtn="Edit"
               contentPlaceholder="Enter new content text for your post (Required)"
               isUploadOpen={true}
-              dialogRef={editFormRef} 
+              dialogRef={editFormRef}
             />
           </div>
         </div>
@@ -447,7 +469,7 @@ const HikingPostDetails = ({
                   leftBtn="Report"
                   contentPlaceholder="Enter valid reasons for your report (Required)"
                   isUploadOpen={false}
-                  dialogRef={reportFormRef} 
+                  dialogRef={reportFormRef}
                 />
               </div>
             </div>

@@ -14,7 +14,8 @@ const VoteCount = styled.div`
   margin: 5px;
   min-width: 80px;
   font-weight: bold;
-  color: #333;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 `;
 
 const UpArrowButton = styled(UpCircleOutlined)`
@@ -24,9 +25,10 @@ const UpArrowButton = styled(UpCircleOutlined)`
   padding: 5px;
   transition: color 0.3s;
   margin: 5px;
+  color: white;
 
   &:hover {
-    color: #007bff;
+    color: #ff6f00;
   }
 
   &:focus {
@@ -36,10 +38,15 @@ const UpArrowButton = styled(UpCircleOutlined)`
   svg {
     width: 24px;
     height: 24px;
+    transition: filter 0.3s; 
   }
 
   &.active {
-    color: #007bff;
+    color: #ff6f00;
+  }
+
+  &:hover svg {
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.3)); 
   }
 `;
 
@@ -50,9 +57,10 @@ const DownArrowButton = styled(DownCircleOutlined)`
   padding: 5px;
   transition: color 0.3s;
   margin: 5px;
+  color: white;
 
   &:hover {
-    color: #007bff;
+    color: #ff6f00;
   }
 
   &:focus {
@@ -62,13 +70,17 @@ const DownArrowButton = styled(DownCircleOutlined)`
   svg {
     width: 24px;
     height: 24px;
+    transition: filter 0.3s; 
   }
 
   &.active {
-    color: #007bff;
+    color: #ff6f00;
+  }
+
+  &:hover svg {
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.3)); 
   }
 `;
-
 
 const HikingVote = ({ postId, containerStyle }) => {
   const [voteCounter, setVoteCounter] = useState(null);
