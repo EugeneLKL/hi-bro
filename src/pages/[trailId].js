@@ -12,6 +12,7 @@ import TrailForm from "../components/common/TrailForm";
 import { useQueryClient } from "react-query";
 import HikingForm from "../components/common/HikingForm";
 import HikingTrailReviews from "../components/hikingTrailsPage/HikingTrailReviews";
+import Confirmation from "../components/common/HikingConfirmation";
 
 const MainContainer = styled.div`
   width: 100%;
@@ -468,6 +469,7 @@ const TrailPage = () => {
   const [estimatedDuration, setEstimatedDuration] = useState("");
   const [trailImagesUrl, setTrailImagesUrl] = useState([]);
   const [makeReview, setMakeReview] = useState(false);
+  const [isDelete, setIsDelete] = useState(false);
   const dropdownRef = useRef(null);
 
   const queryClient = useQueryClient();
@@ -582,7 +584,7 @@ const TrailPage = () => {
 
   // Handlers
   const handleDelete = () => {
-    deleteMutation.mutate();
+    setIsDelete(true);
   };
 
   // TODO - Create receive api for rating
@@ -818,6 +820,15 @@ const TrailPage = () => {
     closeReview();
   };
 
+  const confirmDelete = () => {
+    deleteMutation.mutate();
+    setIsDelete(false);
+  };
+
+  const cancelDelete = () => {
+    setIsDelete(false);
+  };
+
   return (
     <MainContainer>
       <ToastBox />
@@ -864,15 +875,7 @@ const TrailPage = () => {
             </div>
             <ActionButton>Save trail</ActionButton>
             <ActionButton onClick={handleEdit}>Edit Trail</ActionButton>
-            <ActionButton onClick={handleDelete}>
-              {deleteMutation.isLoading
-                ? "Deleting..."
-                : deleteMutation.isError
-                ? "Error deleting"
-                : deleteMutation.isSuccess
-                ? "Trail deleted"
-                : "Delete trail"}
-            </ActionButton>
+            <ActionButton onClick={handleDelete}>Delete trail</ActionButton>
             <ActionButton onClick={openReview}>Write a review</ActionButton>
           </FunctionContainer>
           <MapContainer>
@@ -916,6 +919,13 @@ const TrailPage = () => {
           )}
         </ReviewContainer>
       </PageContent>
+      {isDelete && (
+        <Confirmation
+          message="Are you sure you want to delete this trail?"
+          onConfirm={confirmDelete}
+          onCancel={cancelDelete}
+        ></Confirmation>
+      )}
       {makeReview && (
         <Overlay className="overlay" onClick={handleOverlayClick}>
           <HikingForm
@@ -1006,7 +1016,9 @@ const TrailPage = () => {
                   >
                     <option value="">Select Trail Type</option>
                     <option value={"Day Hike Trail"}>Day Hike Trail</option>
-                    <option value={"Long-Distance Trail"}>Long-Distance Trail</option>
+                    <option value={"Long-Distance Trail"}>
+                      Long-Distance Trail
+                    </option>
                     <option value={"Loop Trail"}>Loop Trail</option>
                     <option value={"Point-to-Point Trail"}>
                       Point-to-Point Trail
