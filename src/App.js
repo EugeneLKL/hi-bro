@@ -38,23 +38,27 @@ function App() {
   const { userId, isLoggedIn, profileImageUrl } = useAuth();
   const [sidebarE, setSidebarE] = useState(false);
   const [sidebarC, setSidebarC] = useState(false);
+  const [connector, setConnector] = useState(false);
 
-  // const location = useLocation();
+  const allowedPaths = ['/connector', '/register', '/'];
 
-  // const isTravelPostPage = location.pathname === "/TravelPost";
-  // const isHikingDiscussionPage = location.pathname === "/hikingDiscussion";
+  useEffect(() => {
+    const currentPath = window.location.pathname;
+    const isAllowedPath = allowedPaths.includes(currentPath);
+
+    setConnector(!isAllowedPath);
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
         <div className="app-container">
-          {isLoggedIn && <NavBar userImageUrl={profileImageUrl} />}
+          {isLoggedIn && connector && <NavBar userImageUrl={profileImageUrl} />}
           <div className="content-container">
-            {/* {isLoggedIn && isHikingDiscussionPage && <SideBar />}
-            {isLoggedIn && isTravelPostPage && <SideBarCK />} */}
             <Routes>
               <Route path="/Register" element={<Register />} />
               <Route path="/" element={<Login />} />
+              <Route path="/connector" element={<Connector />} />
               {isLoggedIn ? (
                 <Route>
                   {/* Hide the sidebar when the Profile is rendered */}

@@ -33,7 +33,7 @@ const Login = () => {
         handleLogin(userId);
         
         // Redirect to the profile page
-        navigate(`/profile/${userId}`);
+        navigate(`/connector`);
       } else {
         // If the password is incorrect
         message.error('Incorrect password');

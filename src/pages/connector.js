@@ -19,14 +19,14 @@ const Connector = () => {
   };
 
   const handleTravelClick = () => {
-    window.location.href = "/travelBuddy";
+    window.location.href = "/TravelPost";
   };
 
   return (
     <div className="flex flex-row w-screen h-screen">
       <div
         className={`w-full h-full flex flex-col items-center justify-center text-center text-white text-4xl cursor-pointer ${
-          hovered === "hiking" ? "w-3/5 backdrop-blur-md" : "w-1/2"
+          hovered === "hiking" ? "w-3/4 backdrop-blur-md" : "w-1/2"
         } transition-all`}
         style={{
           background: `url("../img/edited-41.jpg") center/cover`,
@@ -46,7 +46,7 @@ const Connector = () => {
       </div>
       <div
         className={`w-full h-full flex flex-col items-center justify-center text-center text-white text-4xl cursor-pointer ${
-          hovered === "travel" ? "w-3/5 backdrop-blur-md" : "w-1/2"
+          hovered === "travel" ? "w-3/4 backdrop-blur-md" : "w-1/2"
         } transition-all`}
         style={{
           background: `url("../img/edited-21.jpg") center/cover`,
