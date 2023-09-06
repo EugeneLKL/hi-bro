@@ -5,22 +5,29 @@ import HikingSortPost from "../components/hikingDiscussion/HikingSortPost";
 import HikingDisplayPost from "../components/hikingDiscussion/HikingDisplayPost";
 import { ToastContainer } from "react-toastify";
 import SearchBar from "../components/common/SearchBar";
+import SideBar from "../components/common/SideBar";
 
 const HikingDiscussion = () => {
   const profileImage = "/img/profileIcon.png";
   const [posts, setPosts] = useState(undefined);
   const [sortedPosts, setSortedPosts] = useState(undefined);
-  
+
   const currentUrl = window.location.href;
   const searchApplied = currentUrl.includes("search");
 
   const handleSortChange = (sortValue) => {
     if (sortValue === "new") {
-      setSortedPosts([...posts].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1)));
+      setSortedPosts(
+        [...posts].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1))
+      );
     } else if (sortValue === "old") {
-      setSortedPosts([...posts].sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1)));
+      setSortedPosts(
+        [...posts].sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1))
+      );
     } else if (sortValue === "hot") {
-      setSortedPosts([...posts].sort((a, b) => (a.voteCounter > b.voteCounter ? -1 : 1)));
+      setSortedPosts(
+        [...posts].sort((a, b) => (a.voteCounter > b.voteCounter ? -1 : 1))
+      );
     }
   };
 
@@ -40,7 +47,7 @@ const HikingDiscussion = () => {
     fetchPosts();
   }, []);
 
-  // If searchApplied is false, then we want to display all posts 
+  // If searchApplied is false, then we want to display all posts
   useEffect(() => {
     if (!searchApplied) {
       fetchPosts();
@@ -49,29 +56,34 @@ const HikingDiscussion = () => {
 
   useEffect(() => {
     if (posts) {
-      setSortedPosts([...posts].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1)));
+      setSortedPosts(
+        [...posts].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1))
+      );
     }
   }, [posts]);
 
   return (
-    <div className="main-content">
-      <div className="centered-content">
-        <SearchBar setPosts={setPosts} />
-        <HikingCreatePost profileImage={profileImage} />
-        <HikingSortPost onSortChange={handleSortChange} />
-        {sortedPosts &&
-          sortedPosts.map((post) => (
-            <HikingDisplayPost
-              key={post.postId}
-              postId={post.postId}
-              username={post.username}
-              title={post.title}
-              content={post.content}
-              imageUrl={post.imageUrl}
-            />
-          ))}
+    <div className="flex flex-row w-full">
+      <SideBar />
+      <div className="main-content">
+        <div className="centered-content">
+          <SearchBar setPosts={setPosts} />
+          <HikingCreatePost profileImage={profileImage} />
+          <HikingSortPost onSortChange={handleSortChange} />
+          {sortedPosts &&
+            sortedPosts.map((post) => (
+              <HikingDisplayPost
+                key={post.postId}
+                postId={post.postId}
+                username={post.username}
+                title={post.title}
+                content={post.content}
+                imageUrl={post.imageUrl}
+              />
+            ))}
+        </div>
+        <ToastContainer />
       </div>
-      <ToastContainer />
     </div>
   );
 };

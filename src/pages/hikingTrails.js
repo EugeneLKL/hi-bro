@@ -3,6 +3,7 @@ import { useState } from "react";
 import HikingSearchTrails from "../components/hikingTrails/HikingSearchTrails";
 import HikingDisplayTrails from "../components/hikingTrails/HikingDisplayTrails";
 import HikingSuggestTrails from "../components/hikingTrails/HikingSuggestTrails";
+import SideBar from "../components/common/SideBar";
 
 const fadeIn = keyframes`
   to {
@@ -40,17 +41,20 @@ const HikingTrails = () => {
   const [searchResults, setSearchResults] = useState(null);
 
   return (
-    <HikingTrailContainer>
-      <TrailSearchContainer>
-        <HikingSearchTrails setTrails={setSearchResults}/>
-      </TrailSearchContainer>
-      <TrailDisplayContainer>
-        <HikingDisplayTrails searchResults={searchResults}/>
-      </TrailDisplayContainer>
-      <TrailSuggestContainer>
-        <HikingSuggestTrails />
-      </TrailSuggestContainer>
-    </HikingTrailContainer>
+    <div className="flex flex-row w-full">
+      <SideBar />
+      <HikingTrailContainer>
+        <TrailSearchContainer>
+          <HikingSearchTrails setTrails={setSearchResults} />
+        </TrailSearchContainer>
+        <TrailDisplayContainer>
+          <HikingDisplayTrails searchResults={searchResults} />
+        </TrailDisplayContainer>
+        <TrailSuggestContainer>
+          <HikingSuggestTrails />
+        </TrailSuggestContainer>
+      </HikingTrailContainer>
+    </div>
   );
 };
 

@@ -1,6 +1,7 @@
 import React from "react";
 import styled, { keyframes } from "styled-components";
 import HikingDisplaySavedTrails from "../components/hikingSaved/HikingDisplaySavedTrails";
+import SideBar from "../components/common/SideBar";
 
 const fadeIn = keyframes`
   to {
@@ -51,6 +52,8 @@ const SavedTitle = styled.h1`
 
 const HikingSaved = () => {
   return (
+    <div className="flex flex-row w-full">
+      <SideBar />
     <BackgroundContainer>
       <BackgroundOverlay />
       <ContentContainer>
@@ -58,6 +61,7 @@ const HikingSaved = () => {
         <HikingDisplaySavedTrails />
       </ContentContainer>
     </BackgroundContainer>
+    </div>
   );
 };
 

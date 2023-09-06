@@ -1,0 +1,155 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@800&family=Space+Grotesk:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+.register-form, .login-form {
+  width: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* padding: 50px; */
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  border-radius: 10px;
+  height: 665px;
+  /* In the middle of any size of screen */
+  margin: auto;
+  margin-top: 25px;
+  margin-bottom: 25px;
+  /* Make the form responsive */
+  @media (max-width: 768px) {
+    width: 100%;
+    height: auto;
+    margin-top: 0px;
+    margin-bottom: 0px;
+  }
+}
+
+.register-form form{
+  width: 65%;
+  padding-top: 0px;
+  padding-right: 5%;
+  padding-left: 5%;
+}
+
+
+.login-form form{ 
+  /* Clear the display_flex effect */
+  width: 65%;
+  padding-top: 30px;
+  display: block;
+  margin: auto;
+  height: auto;
+  padding-left: 15%;
+  padding-right: 15%;
+}
+
+.register-form form h1, .login-form form h1 {
+  text-align: center;
+  margin-top: 15px;
+  margin-bottom: 25px;
+  font-family: 'Lexend', sans-serif;
+  font-size: 40px;
+}
+
+.form-design {
+  width: 35%;
+  height: 100%;
+  background: linear-gradient(to right, #243B55, #141E30);
+  color: #fff;
+  /* Make all the items in this div be in the middle and center */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+/* Modify the existing .form-design-button class to remove hover effect */
+.form-design .form-design-button {
+  width: 150px;
+  height: 40px;
+  border-radius: 25px;
+  border: 1px solid #fff;
+  background-color: #ececec00;
+  color: #ffffff;
+  font-size: 13px;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  letter-spacing: 1px;
+}
+
+/* Remove hover effect from .form-design-button */
+.form-design .form-design-button:hover {
+  background-color: #ececec00 !important;
+  border: 1px solid #fff !important;
+  color: #ffffff !important;
+}
+
+
+
+
+
+
+
+
+
+.form-design p {
+  font-size: 15px;
+  /* Spacing between character */
+  letter-spacing: 1px;
+  font-family: 'Poppins', sans-serif;
+  margin-left: 15%;
+  margin-right: 15%;
+  margin-top: 7%;
+  margin-bottom: 15%;
+  /* Make the text aligned in the center */
+  text-align: center;
+}
+
+.form-design h1 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 40px;
+}
+
+.register-form .form-design{
+  border-radius: 10px 0px 0px 10px;
+}
+
+.login-form .form-design {
+  border-radius: 0px 10px 10px 0px;
+}
+
+.register-button, .login-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Design .register-button */
+.register-button button, .login-button button{
+  height: 40px;
+  width: 150px;
+  border-radius: 25px;
+  background-color: #243B55;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  letter-spacing: 1px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.register-button button:hover, .login-button button:hover{
+  background-color: #fff !important;
+  color: #243b55 !important;
+  border: 1px solid #243b55 !important;
+}
+
+/* Hide the scrollbar */
+::-webkit-scrollbar {
+  display: none;
+}

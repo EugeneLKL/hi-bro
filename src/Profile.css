@@ -1,0 +1,139 @@
+/* Add this CSS to your existing CSS file or create a new CSS file */
+
+.profile-container {
+    text-align: center;
+    padding: 20px 30px;
+    box-sizing: border-box;
+    box-shadow: rgba(17, 17, 26, 0.05) 0px 1px 0px, rgba(17, 17, 26, 0.1) 0px 0px 8px;
+    /* Make the width fit the page */
+    width: 50%;
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    overflow: hidden; /* Prevent content overflow */
+    position: relative; /* Establish a positioning context */
+}
+
+
+.profile-profilePic-container {
+    margin-bottom: 20px;
+    text-align: center;
+    /* border: 1px solid red; */
+    box-shadow: rgba(17, 17, 26, 0.05) 0px 1px 0px, rgba(17, 17, 26, 0.1) 0px 0px 8px;
+    margin: auto;
+    overflow: hidden; /* Prevent content overflow */
+    z-index: 1; /* Place above the hover effect */
+    /* Same shape */
+    border-radius: 50%;
+    width: 250px; /* Set a fixed width */
+    height: 250px; /* Set a fixed height */
+    object-fit: cover;
+    margin-bottom: 20px;
+}
+
+.profile-profilePic-container:hover {
+    background-color: white;
+}
+
+.profile-profilePic {
+    /* Display at the center of the div */
+    display: block;
+    margin: auto;
+    /* Same shape */
+    border-radius: 50%;
+    width: 250px; /* Set a fixed width */
+    height: 250px; /* Set a fixed height */
+    z-index: 1; /* Place above the hover effect */
+    object-fit: cover;
+    
+}
+
+.profile-profilePic:hover {
+    z-index: 2; /* Place above the content */
+}
+
+.profile-info {
+    font-family: 'Poppins', sans-serif;
+    z-index: 1; /* Place above the hover effect */
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+    width: 75%;
+    padding: 5%;
+    /* Center and middle it */
+    margin: auto;
+    justify-content: center;
+    /* Align to left */
+    /* text-align: left; */
+    /* Make the text wrap */
+    /* word-wrap: break-word; */
+    /* Make the text not overflow */
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+
+.profile-form-item {
+    /* Display in one line */
+    display: flex;
+    justify-content: space-between;
+    /* align-items: center; */
+    margin-bottom: 10px;
+    /* border: 1px solid blue; */
+}
+
+.profile-form-item label {
+    /* border: solid purple 1px; */
+    width: 125px;
+    /* Has border right only */
+    border-right: 1px solid #000000;
+    /* 10px margin right */
+    margin-right: 10px;
+}
+
+.profile-form-item button {
+    /* border: solid red 1px; */
+    margin-right: 5px;
+}
+
+.navbar .profile {
+  font-size: 1.1rem;
+  /* border: 1px solid red; */
+}
+
+.navbar .profile:hover,
+.profile .profile-link:hover,
+.profile .profile-name:hover {
+  text-decoration: none;
+  color: #ffa500;
+  font-size: 1.1rem;
+  /* Add !important to ensure these styles take precedence */
+  text-decoration: none !important;
+  color: #ffa500 !important;
+  transition: 0.2s;
+  /* ... Other styles */
+}
+
+.profile-link p{
+    /* move higher */
+    margin-left: 2px;
+    margin-bottom: 4px;
+  }
+
+  .profile-name{
+    max-width: 100px;
+    overflow: hidden;
+  }
+
+  
+
+
+  /* .logoutButton:hover {
+    color: white !important; 
+    border: red !important;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+  } */
+  
+  
+  
+

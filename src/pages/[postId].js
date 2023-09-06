@@ -6,6 +6,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { ToastContainer } from "react-toastify";
+import SideBar from "../components/common/SideBar";
 
 const PostPage = () => {
   const { postId } = useParams();
@@ -21,7 +22,7 @@ const PostPage = () => {
       // Send a DELETE request to the server using the postId from the URL
       await axios.delete(`/api/posts/${postId}`);
       // Redirect to the main page
-      navigate("/");
+      navigate("/hikingDiscussion");
     } catch (error) {
       console.error(error);
       // Handle the error or display an error message
@@ -41,7 +42,6 @@ const PostPage = () => {
     };
 
     fetchPosts();
-
   }, [postId]);
 
   useEffect(() => {
@@ -62,28 +62,31 @@ const PostPage = () => {
   }, [postId]);
 
   return (
-    <div className="main-content">
-      <div className="centered-content">
-        <HikingVote postId={postId} />
-        {posts &&
-          posts.map((post) => (
-            <HikingPostDetails
-              key={post.postId}
-              postId={post.postId}
-              username={username} //post.username
-              title={post.title}
-              content={post.content}
-              imageUrl={post.imageUrl}
-              isDetail={true}
-              onDelete={handleDelete}
-            />
-          ))}
-        <HikingCreateComment profileImage={profileImage} postId={postId} />
-        <br />
-        <h2>Comments</h2>
-        <HikingPostComments postId={postId} comments={comments}/>
+    <div className="flex flex-row w-full">
+      <SideBar />
+      <div className="main-content">
+        <div className="centered-content">
+          <HikingVote postId={postId} />
+          {posts &&
+            posts.map((post) => (
+              <HikingPostDetails
+                key={post.postId}
+                postId={post.postId}
+                username={username} //post.username
+                title={post.title}
+                content={post.content}
+                imageUrl={post.imageUrl}
+                isDetail={true}
+                onDelete={handleDelete}
+              />
+            ))}
+          <HikingCreateComment profileImage={profileImage} postId={postId} />
+          <br />
+          <h2>Comments</h2>
+          <HikingPostComments postId={postId} comments={comments} />
+        </div>
+        <ToastContainer />
       </div>
-      <ToastContainer />
     </div>
   );
 };

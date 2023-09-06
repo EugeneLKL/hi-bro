@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Link as RouterLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { DownOutlined } from "@ant-design/icons";
 import styled from "styled-components";
 
@@ -51,7 +51,7 @@ const DropdownContent = styled.div`
   transition: opacity 0.3s, visibility 0.3s;
 `;
 
-const CustomLink = styled(RouterLink)`
+const CustomLink = styled(Link)`
   color: inherit;
   text-decoration: none;
   width: 180px;

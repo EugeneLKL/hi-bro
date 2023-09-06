@@ -7,6 +7,7 @@ import axios from "axios";
 import GoogleMap from "../components/common/GoogleMap";
 import Modal from "react-modal";
 import { useNavigate } from "react-router-dom";
+import SideBar from "../components/common/SideBar";
 
 const Background = styled.div`
   background-image: url("../img/trailsFormBackground.jpg");
@@ -372,7 +373,7 @@ const SuggestTrail = () => {
       setIsSubmitConfirmationOpen(false);
       return;
     }
-    
+
     try {
       const formData = new FormData();
 
@@ -657,241 +658,248 @@ const SuggestTrail = () => {
   };
 
   return (
-    <Background>
-      <FormContainer>
-        <form onSubmit={handleSubmit}>
-          <Title>Suggest a Trail</Title>
-          <FormGroup>
-            <Label>
-              <RedAsterisk>*</RedAsterisk>Trail Name
-            </Label>
-            <Input
-              type="text"
-              name="trailName"
-              value={trailData.trailName}
-              onChange={handleChange}
-            />
-            {errors.trailName && <ErrorMsg>{errors.trailName}</ErrorMsg>}
-          </FormGroup>
+    <div className="flex flex-row w-full">
+      <SideBar />
+      <Background>
+        <FormContainer>
+          <form onSubmit={handleSubmit}>
+            <Title>Suggest a Trail</Title>
+            <FormGroup>
+              <Label>
+                <RedAsterisk>*</RedAsterisk>Trail Name
+              </Label>
+              <Input
+                type="text"
+                name="trailName"
+                value={trailData.trailName}
+                onChange={handleChange}
+              />
+              {errors.trailName && <ErrorMsg>{errors.trailName}</ErrorMsg>}
+            </FormGroup>
 
-          <FormGroup>
-            <Label>
-              <RedAsterisk>*</RedAsterisk>Trail Location
-            </Label>
+            <FormGroup>
+              <Label>
+                <RedAsterisk>*</RedAsterisk>Trail Location
+              </Label>
 
-            <MapButton type="button" onClick={openMap}>
-              Open Map
-            </MapButton>
+              <MapButton type="button" onClick={openMap}>
+                Open Map
+              </MapButton>
 
-            <div>
-              <h4 className="mt-2">
-                Selected Coordinates (Current location by Default):
-              </h4>
-              <p>Latitude: {selectedLocation.lat}</p>
-              <p>Longitude: {selectedLocation.lng}</p>
-            </div>
+              <div>
+                <h4 className="mt-2">
+                  Selected Coordinates (Current location by Default):
+                </h4>
+                <p>Latitude: {selectedLocation.lat}</p>
+                <p>Longitude: {selectedLocation.lng}</p>
+              </div>
 
-            <Modal isOpen={isMapModalOpen} onRequestClose={closeMap}>
-              <h2 className="mb-1">Select Location on Map</h2>
-              <MapContainer>
-                <GoogleMap
-                  trailLat={selectedLocation.lat}
-                  trailLng={selectedLocation.lng}
-                  mapSearch={true}
-                  w="100%"
-                  h="670px"
-                  streetViewControl={false}
-                  onMarkerPositionChange={handleMarkerPositionChange}
-                  draggable={true}
-                  clickEnabled={true}
-                />
-                <MapButtonContainer>
-                  <SetLocationButton onClick={handleSetLocation}>
-                    Set Location
-                  </SetLocationButton>
-                  <CloseMapButton onClick={handleCloseMap}>
-                    Close Map
-                  </CloseMapButton>
-                </MapButtonContainer>
-              </MapContainer>
-            </Modal>
-          </FormGroup>
+              <Modal isOpen={isMapModalOpen} onRequestClose={closeMap}>
+                <h2 className="mb-1">Select Location on Map</h2>
+                <MapContainer>
+                  <GoogleMap
+                    trailLat={selectedLocation.lat}
+                    trailLng={selectedLocation.lng}
+                    mapSearch={true}
+                    w="100%"
+                    h="670px"
+                    streetViewControl={false}
+                    onMarkerPositionChange={handleMarkerPositionChange}
+                    draggable={true}
+                    clickEnabled={true}
+                  />
+                  <MapButtonContainer>
+                    <SetLocationButton onClick={handleSetLocation}>
+                      Set Location
+                    </SetLocationButton>
+                    <CloseMapButton onClick={handleCloseMap}>
+                      Close Map
+                    </CloseMapButton>
+                  </MapButtonContainer>
+                </MapContainer>
+              </Modal>
+            </FormGroup>
 
-          <FormGroup>
-            <Label>
-              <RedAsterisk>*</RedAsterisk>Trail Type
-            </Label>
-            <TrailSelect
-              name="trailType"
-              value={trailData.trailType}
-              onChange={handleChange}
+            <FormGroup>
+              <Label>
+                <RedAsterisk>*</RedAsterisk>Trail Type
+              </Label>
+              <TrailSelect
+                name="trailType"
+                value={trailData.trailType}
+                onChange={handleChange}
               >
-              <option value="">Select Trail Type</option>
-              <option value={"Day Hike Trail"}>Day Hike Trail</option>
-              <option value={"Long-Distance Trail"}>Long-Distance Trail</option>
-              <option value={"Loop Trail"}>Loop Trail</option>
-              <option value={"Point-to-Point Trail"}>
-                Point-to-Point Trail
-              </option>
-              <option value={"Mountain Trail"}>Mountain Trail</option>
-              <option value={"Coastal Trail"}>Coastal Trail</option>
-              <option value={"Forest Trail"}>Forest Trail</option>
-              <option value={"Desert Trail"}>Desert Trail</option>
-              <option value={"Waterfall Trail"}>Waterfall Trail</option>
-              <option value={"Canyon Trail"}>Canyon Trail</option>
-              <option value={"Wilderness Trail"}>Wilderness Trail</option>
-              <option value={"Heritage Trail"}>Heritage Trail</option>
-              <option value={"Family Friendly Trail"}>
-                Family-Friendly Trail
-              </option>
-              <option value={"Themed Trail"}>Themed Trail</option>
-            </TrailSelect>
-            {errors.trailType && <ErrorMsg>{errors.trailType}</ErrorMsg>}
-          </FormGroup>
+                <option value="">Select Trail Type</option>
+                <option value={"Day Hike Trail"}>Day Hike Trail</option>
+                <option value={"Long-Distance Trail"}>
+                  Long-Distance Trail
+                </option>
+                <option value={"Loop Trail"}>Loop Trail</option>
+                <option value={"Point-to-Point Trail"}>
+                  Point-to-Point Trail
+                </option>
+                <option value={"Mountain Trail"}>Mountain Trail</option>
+                <option value={"Coastal Trail"}>Coastal Trail</option>
+                <option value={"Forest Trail"}>Forest Trail</option>
+                <option value={"Desert Trail"}>Desert Trail</option>
+                <option value={"Waterfall Trail"}>Waterfall Trail</option>
+                <option value={"Canyon Trail"}>Canyon Trail</option>
+                <option value={"Wilderness Trail"}>Wilderness Trail</option>
+                <option value={"Heritage Trail"}>Heritage Trail</option>
+                <option value={"Family Friendly Trail"}>
+                  Family-Friendly Trail
+                </option>
+                <option value={"Themed Trail"}>Themed Trail</option>
+              </TrailSelect>
+              {errors.trailType && <ErrorMsg>{errors.trailType}</ErrorMsg>}
+            </FormGroup>
 
-          <FormGroup>
-            <Label>
-              <RedAsterisk>*</RedAsterisk>Trail Difficulty
-            </Label>
-            <TrailSelect
-              name="trailDifficulty"
-              value={trailData.trailDifficulty}
-              onChange={handleChange}
-            >
-              <option value="">Select Trail Difficulty</option>
-              <option value={"Easy"}>Easy</option>
-              <option value={"Moderate"}>Moderate</option>
-              <option value={"Hard"}>Hard</option>
-              <option value={"Expert"}>Very Hard</option>
-            </TrailSelect>
-            {errors.trailDifficulty && (
-              <ErrorMsg>{errors.trailDifficulty}</ErrorMsg>
-            )}
-          </FormGroup>
-
-          <FormGroup>
-            <Label>
-              <RedAsterisk>*</RedAsterisk>Trail Length
-            </Label>
-            <TrailSelect
-              name="trailLength"
-              value={trailData.trailLength}
-              onChange={handleChange}
-            >
-              <option value="">Select Trail Length</option>
-              <option value={"Short"}>Short (~3.2km)</option>
-              <option value={"Moderate"}>Moderate (3.2 to 8km)</option>
-              <option value={"Intermediate"}>Intermediate (8 to 16 km)</option>
-              <option value={"Longer"}>Longer (16 to 32 km)</option>
-              <option value={"Extended"}>Extended (32+ km)</option>
-            </TrailSelect>
-            {errors.trailLength && <ErrorMsg>{errors.trailLength}</ErrorMsg>}
-          </FormGroup>
-
-          <FormGroup>
-            <Label>Estimated Duration</Label>
-            <Input
-              type="text"
-              name="estimatedDuration"
-              value={trailData.estimatedDuration}
-              onChange={handleChange}
-              disabled
-            />
-          </FormGroup>
-
-          <FormGroup>
-            <Label>
-              <RedAsterisk>*</RedAsterisk>Trail Description
-            </Label>
-            <TextArea
-              name="trailDescription"
-              value={trailData.trailDescription}
-              onChange={handleChange}
-            />
-            {errors.trailDescription && (
-              <ErrorMsg>{errors.trailDescription}</ErrorMsg>
-            )}
-          </FormGroup>
-
-          <FormGroup>
-            <Label>Amenities (Optional)</Label>
-            <CheckboxDropdown ref={dropdownRef}>
-              <DropdownToggle onClick={toggleDropdown}>
-                {dropdownOpen ? "Select Amenities" : "Select Amenities ▼"}
-              </DropdownToggle>
-              {dropdownOpen && (
-                <DropdownContent>
-                  {amenityOptions.map((amenity) => (
-                    <CheckboxLabel key={amenity}>
-                      <CheckboxInput
-                        type="checkbox"
-                        name="amenities"
-                        value={amenity}
-                        checked={selectedAmenities.includes(amenity)}
-                        onChange={handleChange}
-                      />
-                      {amenity}
-                    </CheckboxLabel>
-                  ))}
-                </DropdownContent>
+            <FormGroup>
+              <Label>
+                <RedAsterisk>*</RedAsterisk>Trail Difficulty
+              </Label>
+              <TrailSelect
+                name="trailDifficulty"
+                value={trailData.trailDifficulty}
+                onChange={handleChange}
+              >
+                <option value="">Select Trail Difficulty</option>
+                <option value={"Easy"}>Easy</option>
+                <option value={"Moderate"}>Moderate</option>
+                <option value={"Hard"}>Hard</option>
+                <option value={"Expert"}>Very Hard</option>
+              </TrailSelect>
+              {errors.trailDifficulty && (
+                <ErrorMsg>{errors.trailDifficulty}</ErrorMsg>
               )}
-            </CheckboxDropdown>
-            <SelectedAmenitiesBox>
-              {selectedAmenities.map((selectedAmenity, index) => (
-                <SelectedAmenity key={index}>
-                  {selectedAmenity}
-                  <RemoveIcon
-                    onClick={() => handleRemoveAmenity(selectedAmenity)}
-                  >
-                    x
-                  </RemoveIcon>
-                </SelectedAmenity>
-              ))}
-            </SelectedAmenitiesBox>
-          </FormGroup>
+            </FormGroup>
 
-          <FormGroup>
-            <Label>
-              <RedAsterisk>*</RedAsterisk>Trail Images
-            </Label>
-            <Input
-              type="file"
-              accept="image/*"
-              name="trailImages"
-              onChange={handleChange}
-              multiple
+            <FormGroup>
+              <Label>
+                <RedAsterisk>*</RedAsterisk>Trail Length
+              </Label>
+              <TrailSelect
+                name="trailLength"
+                value={trailData.trailLength}
+                onChange={handleChange}
+              >
+                <option value="">Select Trail Length</option>
+                <option value={"Short"}>Short (~3.2km)</option>
+                <option value={"Moderate"}>Moderate (3.2 to 8km)</option>
+                <option value={"Intermediate"}>
+                  Intermediate (8 to 16 km)
+                </option>
+                <option value={"Longer"}>Longer (16 to 32 km)</option>
+                <option value={"Extended"}>Extended (32+ km)</option>
+              </TrailSelect>
+              {errors.trailLength && <ErrorMsg>{errors.trailLength}</ErrorMsg>}
+            </FormGroup>
+
+            <FormGroup>
+              <Label>Estimated Duration</Label>
+              <Input
+                type="text"
+                name="estimatedDuration"
+                value={trailData.estimatedDuration}
+                onChange={handleChange}
+                disabled
+              />
+            </FormGroup>
+
+            <FormGroup>
+              <Label>
+                <RedAsterisk>*</RedAsterisk>Trail Description
+              </Label>
+              <TextArea
+                name="trailDescription"
+                value={trailData.trailDescription}
+                onChange={handleChange}
+              />
+              {errors.trailDescription && (
+                <ErrorMsg>{errors.trailDescription}</ErrorMsg>
+              )}
+            </FormGroup>
+
+            <FormGroup>
+              <Label>Amenities (Optional)</Label>
+              <CheckboxDropdown ref={dropdownRef}>
+                <DropdownToggle onClick={toggleDropdown}>
+                  {dropdownOpen ? "Select Amenities" : "Select Amenities ▼"}
+                </DropdownToggle>
+                {dropdownOpen && (
+                  <DropdownContent>
+                    {amenityOptions.map((amenity) => (
+                      <CheckboxLabel key={amenity}>
+                        <CheckboxInput
+                          type="checkbox"
+                          name="amenities"
+                          value={amenity}
+                          checked={selectedAmenities.includes(amenity)}
+                          onChange={handleChange}
+                        />
+                        {amenity}
+                      </CheckboxLabel>
+                    ))}
+                  </DropdownContent>
+                )}
+              </CheckboxDropdown>
+              <SelectedAmenitiesBox>
+                {selectedAmenities.map((selectedAmenity, index) => (
+                  <SelectedAmenity key={index}>
+                    {selectedAmenity}
+                    <RemoveIcon
+                      onClick={() => handleRemoveAmenity(selectedAmenity)}
+                    >
+                      x
+                    </RemoveIcon>
+                  </SelectedAmenity>
+                ))}
+              </SelectedAmenitiesBox>
+            </FormGroup>
+
+            <FormGroup>
+              <Label>
+                <RedAsterisk>*</RedAsterisk>Trail Images
+              </Label>
+              <Input
+                type="file"
+                accept="image/*"
+                name="trailImages"
+                onChange={handleChange}
+                multiple
+              />
+              <ImagePreviewContainer>
+                {imagePreviews.map((previewUrl, index) => (
+                  <ImagePreview
+                    key={index}
+                    src={previewUrl}
+                    alt={`Trail Preview ${index + 1}`}
+                  />
+                ))}
+              </ImagePreviewContainer>
+              {errors.trailImages && <ErrorMsg>{errors.trailImages}</ErrorMsg>}
+            </FormGroup>
+
+            <FormButtons>
+              <SubmitButton type="submit">Submit</SubmitButton>
+
+              <ClearButton type="button" onClick={handleClearAllFields}>
+                Clear All Fields
+              </ClearButton>
+            </FormButtons>
+          </form>
+
+          {isSubmitConfirmationOpen && (
+            <Confirmation
+              message="Are you sure you want to suggest this trail?"
+              onConfirm={handleSubmitConfirmed}
+              onCancel={handleConfirmationCancel}
             />
-            <ImagePreviewContainer>
-              {imagePreviews.map((previewUrl, index) => (
-                <ImagePreview
-                  key={index}
-                  src={previewUrl}
-                  alt={`Trail Preview ${index + 1}`}
-                />
-              ))}
-            </ImagePreviewContainer>
-            {errors.trailImages && <ErrorMsg>{errors.trailImages}</ErrorMsg>}
-          </FormGroup>
-
-          <FormButtons>
-            <SubmitButton type="submit">Submit</SubmitButton>
-
-            <ClearButton type="button" onClick={handleClearAllFields}>
-              Clear All Fields
-            </ClearButton>
-          </FormButtons>
-        </form>
-
-        {isSubmitConfirmationOpen && (
-          <Confirmation
-            message="Are you sure you want to suggest this trail?"
-            onConfirm={handleSubmitConfirmed}
-            onCancel={handleConfirmationCancel}
-          />
-        )}
-      </FormContainer>
-      <ToastContainer position="top-center" autoClose={1000} />
-    </Background>
+          )}
+        </FormContainer>
+        <ToastContainer position="top-center" autoClose={1000} />
+      </Background>
+    </div>
   );
 };
 

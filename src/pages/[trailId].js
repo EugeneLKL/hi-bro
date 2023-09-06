@@ -13,6 +13,7 @@ import { useQueryClient } from "react-query";
 import HikingForm from "../components/common/HikingForm";
 import HikingTrailReviews from "../components/hikingTrailsPage/HikingTrailReviews";
 import Confirmation from "../components/common/HikingConfirmation";
+import SideBar from "../components/common/SideBar";
 
 const MainContainer = styled.div`
   width: 100%;
@@ -830,6 +831,8 @@ const TrailPage = () => {
   };
 
   return (
+    <div className="flex flex-row w-full">
+      <SideBar />
     <MainContainer>
       <ToastBox />
       <PageContent>
@@ -1210,6 +1213,7 @@ const TrailPage = () => {
         </Overlay>
       )}
     </MainContainer>
+    </div>
   );
 };
 
