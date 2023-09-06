@@ -67,7 +67,7 @@ const Login = () => {
                 // style={{ maxWidth: 600 }}    
                 scrollToFirstError
             >
-                <h1>Sign HAHA</h1>
+                <h1>Sign In</h1>
                 <Form.Item
                     name="email"
                     className='login-form-input'
