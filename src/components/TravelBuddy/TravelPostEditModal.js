@@ -16,12 +16,7 @@ const TravelPostEditModal = (props) => {
     const [form] = Form.useForm();
     const { TextArea } = Input;
     const [loading, setLoading] = useState(false);
-    // Usestate for travelPost
     const [travelPost, setTravelPost] = useState({});
-    const [values, setValues] = useState({
-        destination: '',
-        additionalInfo: '',
-    })
 
     // Get travelPost Details
     const [initialFormValues, setInitialFormValues] = useState({});
@@ -29,33 +24,32 @@ const TravelPostEditModal = (props) => {
     useEffect(() => {
         const fetchTravelPost = async () => {
             try {
-                console.log('Modal Run');
                 const response = await axios.get(`/api/getTravelBuddyPostDetails/${props.postId}`, {
                     params: { travelPostId: props.postId },
                 });
-                console.log(response.data);
-    
-                console.log(travelPost);
-    
-                // Set the data into the travelPost state
                 setTravelPost(response.data);
-    
-                // Use form.setFieldsValue to initialize the form fields
+                console.log(travelPost);
+                // Modify this part to handle the format
+                setTimeout(() => {
                 form.setFieldsValue({
-                    date: [moment(response.data.startDate), moment(response.data.endDate)],
                     buddyPreference: response.data.buddyPreference,
                     additionalInfo: response.data.additionalInfo,
-                    destination: response.data.destination, // Initialize the "Destination" field
+                    destination: response.data.destination, 
                 });
+            }, 0);
+                console.log(response.data.destination);
             } catch (error) {
-                console.log(error);
+                console.error("Error fetching travel post details:", error);
+                // Consider giving feedback to the user here.
             }
         };
         fetchTravelPost();
-    }, []);
+    }, [props.postId, form]);
+    
 
-    
-    
+
+
+
 
     const { RangePicker } = DatePicker;
 
@@ -77,9 +71,11 @@ const TravelPostEditModal = (props) => {
     };
 
     const onFinish = async (values) => {
-        // Handle form submission here
+        // TODO: Implement form submission logic
+        setLoading(true);
+        // e.g., await saveTravelPost(values);
+        setLoading(false);
     };
-
     return (
         <Modal
             visible={props.visible}
@@ -90,7 +86,7 @@ const TravelPostEditModal = (props) => {
                 <Button key="cancel" onClick={props.onCancel}>
                     Cancel
                 </Button>,
-                <Button key="save" type="primary" loading={loading} onClick={props.handleSubmit}>
+                <Button key="save" type="primary" loading={loading} onClick={() => form.submit()}>
                     Confirm
                 </Button>,
             ]}
@@ -102,10 +98,6 @@ const TravelPostEditModal = (props) => {
                 wrapperCol={{ span: 25 }}
                 layout="vertical"
                 scrollToFirstError
-                initialValues={{
-                    additionalInfo: travelPost.additionalInfo,
-                    destination: travelPost.destination,
-                }}
             >
                 <Form.Item
                     name="date"
@@ -130,32 +122,45 @@ const TravelPostEditModal = (props) => {
                         },
                     ]}
                 >
-                    <RangePicker disabledDate={disabledDate} />
+                    <RangePicker format="DD-MM-YYYY" disabledDate={disabledDate} />
                 </Form.Item>
 
+
                 <Form.Item
-                    name="destination"
-                    label={
-                        <span
-                            style={{
-                                marginTop: '10px',
-                                marginLeft: '3px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: "0.5rem",
-                            }}
-                        >
-                            <CiLocationOn size={24} />
-                            Destination
-                        </span>
-                    }
-                    initialValue={travelPost.destination}
-                >
-                    <Tooltip title="You cannot change your destination">
-                        <Input readOnly />
-                    </Tooltip>
-                </Form.Item>
+    name="destination"
+    label={
+        <span
+            style={{
+                marginTop: '10px',
+                marginLeft: '3px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: "0.5rem",
+            }}
+        >
+            <CiLocationOn size={24} />
+            Destination
+        </span>
+    }
+>
+<Tooltip title="You cannot change your destination">
+    <Input 
+        style={{
+            backgroundColor: '#f5f5f5',
+            borderColor: '#d9d9d9',
+            cursor: 'not-allowed',
+            '&:hover': {
+                borderColor: '#d9d9d9'
+            }
+        }} 
+        readOnly 
+        value={travelPost.destination}
+    />
+</Tooltip>
+
+</Form.Item>
+
 
 
 
