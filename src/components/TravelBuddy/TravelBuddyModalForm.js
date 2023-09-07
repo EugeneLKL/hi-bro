@@ -79,7 +79,6 @@ const TravelBuddyModalForm = () => {
         }
     };
 
-
     const destinations = [
         {
             value: 'Kuala Lumpur',
@@ -353,6 +352,7 @@ const TravelBuddyModalForm = () => {
         }
     ];
 
+
     // onFinish
     const onFinish = async (values) => {
         console.log('Success:', values);
@@ -374,8 +374,8 @@ const TravelBuddyModalForm = () => {
 
 
 
-        const startDate = values.date[0];
-        const endDate = values.date[1];
+        const startDate = values.date[0].format('YYYY-MM-DD');
+        const endDate = values.date[1].format('YYYY-MM-DD');
 
         let preference = values.buddyPreference || [];
 
@@ -407,16 +407,26 @@ const TravelBuddyModalForm = () => {
         console.log(typeof newPost.startDate);
 
         // TODO: Confirmation
-        const confirmed = await modal.confirm(config);
-
-        if (confirmed) {
-            const response = await axios.post('/api/createTravelBuddyPost', newPost);
-            console.log(response);
-            setIsModalOpen(false);
-            setRerender(!rerender);
-
-
-        }
+        modal.confirm({
+            title: 'Confirm posting?',
+            content: 'Are you sure you want to post it?',
+            onOk: async () => {
+                try {
+                    // If user confirms, then make the API call
+                    const response = await axios.post('/api/createTravelBuddyPost', newPost);
+                    console.log(response);
+                    setIsModalOpen(false);
+                    setRerender(!rerender);
+                } catch (error) {
+                    console.error('Error creating post:', error);
+                    // Handle error. E.g. show notification to user
+                }
+            },
+            onCancel: () => {
+                console.log('User cancelled the operation');
+                // Optionally reset form or other actions
+            }
+        });
 
 
         // Close the modal
@@ -429,7 +439,7 @@ const TravelBuddyModalForm = () => {
                 type="primary"
                 onClick={showModal}
                 style={{ marginLeft: '20px' }}>
-                <AiOutlinePlus style={{display:'flex', alignContent:'center', justifyContent:'center'}}/>
+                <AiOutlinePlus style={{ display: 'flex', alignContent: 'center', justifyContent: 'center' }} />
             </Button>
             <Modal
                 title="Let's Travel Together!"

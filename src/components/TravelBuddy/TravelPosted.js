@@ -14,6 +14,7 @@ const TravelPosted = () => {
     const history = useNavigate();
     const { userId, rerender, setRerender } = useAuth();
     const [posts, setPosts] = useState([]);
+    const [postRequester, setPostRequester] = useState([]);
     const [imageUrl, setImageUrl] = useState('');
     const [loadingStates, setLoadingStates] = useState({});
     const [isEditPostModalVisible, setIsEditPostModalVisible] = useState(false);
@@ -59,18 +60,33 @@ const TravelPosted = () => {
 
     const handleDeleteClick = (post) => {
         console.log('Delete ID', post.travelPostId);
-
-        Modal.confirm({
-            title: 'Are you sure you want to delete this post?',
-            content: 'This action cannot be undone.',
-            okText: 'Yes, Delete it',
-            okType: 'danger',
-            cancelText: 'No',
-            onOk() {
-                deletePost(post.travelPostId); // Pass the travelPostId as an argument
-            },
-        });
+    
+        // Check if there are requesters
+        if (post.requesterCount > 0) {
+            Modal.confirm({
+                title: 'Delete post?',
+                content: `There are already ${post.requesterCount} requester(s) for this post. Deleting this will remove their requests as well. Are you sure you want to proceed?`,
+                okText: 'Yes, Delete it',
+                okType: 'danger',
+                cancelText: 'No',
+                onOk() {
+                    deletePost(post.travelPostId);
+                },
+            });
+        } else {
+            Modal.confirm({
+                title: 'Delete post?',
+                content: 'This action cannot be undone.',
+                okText: 'Yes, Delete it',
+                okType: 'danger',
+                cancelText: 'No',
+                onOk() {
+                    deletePost(post.travelPostId);
+                },
+            });
+        }
     };
+    
 
     const deletePost = async (id) => {
         try {
@@ -99,38 +115,54 @@ const TravelPosted = () => {
         return days;
     };
 
+    const countRequesters = (postId, allRequests) => {
+        return allRequests.filter(request => request.post.travelPostId === postId).length;
+    };
+    
     useEffect(() => {
-        const getPosts = async () => {
+        const getPostsAndRequests = async () => {
             try {
-                const result = await axios.get('/api/getTravelBuddyPost');
-                console.log(result);
+                const postResult = await axios.get('/api/getTravelBuddyPost');
+                const requestResult = await axios.get('/api/getAllBuddyRequests');
+    
                 // Filter out the posts that belong to the logged-in user
-                const nonUserPosts = result.data.filter(post =>
-                    post.creator.userId !== userId &&
-                    !post.buddyFound);
-
-                // Fetch the post posted by the logged-in user
-                const userPosts = result.data.filter(post =>
-                    post.creator.userId === userId);
-                if (nonUserPosts) {
-                    setPosts(nonUserPosts);
-                }
-                if (userPosts) {
+                const userPosts = postResult.data.filter(post => post.creator.userId === userId);
+    
+                // For each user post, add requesterCount
+                userPosts.forEach(post => {
+                    post.requesterCount = countRequesters(post.travelPostId, requestResult.data);
+                });
+    
+                // Set the posts with requester count to the state
+                if (userPosts.length) {
                     setPosts(userPosts);
                 }
-            } catch (error) { }
+    
+            } catch (error) {
+                console.error("Failed to fetch posts and requests:", error);
+            }
         };
-        getPosts();
+    
+        getPostsAndRequests();
     }, [userId, rerender]);
+    
+
 
     const { Meta } = Card;
+
+    const actionButtonsStyles = {
+        position: 'absolute',
+        bottom: '10px',
+        right: '10px',
+        display: 'flex',
+        gap: '0px'  // Creates a gap between buttons
+    };
 
     return (
         <div
             style={{
                 // Display at the center of the screen
-                display: 'flex',
-                justifyContent: 'center',
+
                 width: '100%',
                 // border: '1px solid red'
             }}>
@@ -190,14 +222,15 @@ const TravelPosted = () => {
                                     display: 'flex',
                                     alignItems: 'center',
                                     marginTop: '8px',
-
                                 }}>
                                 <BiSolidUser style={{
                                     marginRight: '10px',
                                     marginLeft: '8px',
                                 }} />
-                                10 Requester
+                                {post.requesterCount} Requester(s)
                             </p>
+
+
 
                             {/* Display buddy preference which is an array line by line */}
                             {post.additionalInfo && (
@@ -224,23 +257,18 @@ const TravelPosted = () => {
                                     <li key={index}>{preference}</li>
                                 ))}
                             </ul>
-                            <Button
-                                onClick={() => handleEditClick(post)}>
-                                Edit
-                            </Button>
+                            <div style={actionButtonsStyles}>
+                                <Button onClick={() => handleEditClick(post)}>Edit</Button>
+                                <Button type="danger" onClick={() => handleDeleteClick(post)}>Delete</Button>
 
-
-
-                            <Button
-                                onClick={() => handleDeleteClick(post)}>
-                                Delete
-                            </Button>
+                            </div>
                         </Card>
                     </Col>
                 ))}
             </Row>
 
-            {isEditPostModalVisible &&
+            {
+                isEditPostModalVisible &&
                 <EditPostModal
                     visible={isEditPostModalVisible}
                     onCancel={hideEditPostModal}
@@ -248,7 +276,7 @@ const TravelPosted = () => {
                     postId={editPostData}
                 />
             }
-        </div>
+        </div >
     );
 }
 

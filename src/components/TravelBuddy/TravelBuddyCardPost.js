@@ -135,9 +135,6 @@ const TravelBuddyCardPost = () => {
     return (
         <div
             style={{
-                // Display at the center of the screen
-                display: 'flex',
-                justifyContent: 'center',
                 width: '100%',
                 // border: '1px solid red'
             }}>
