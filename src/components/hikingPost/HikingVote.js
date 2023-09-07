@@ -92,25 +92,7 @@ const HikingVote = ({ postId, containerStyle }) => {
   `;
 
   const voteUp = async () => {
-    try {
-      // Check if the user has already voted for this postId
-      const hasVotedResponse = await axios.get(`/api/votes/${postId}/hasVoted`, {
-        params: {
-          userId,
-        },
-      });
-
-      if (hasVotedResponse.data.hasVoted) {
-        // User has already voted, handle this case accordingly
-        return;
-      }
-
-      // User hasn't voted, allow them to vote
-      setVoteCounter((prevVoteCounter) => prevVoteCounter + 1);
-    } catch (error) {
-      console.error(error);
-      // Handle error, if needed
-    }
+    setVoteCounter((prevVoteCounter) => prevVoteCounter + 1);
   };
 
   const voteDown = () => {

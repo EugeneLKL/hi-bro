@@ -8,6 +8,7 @@ import GoogleMap from "../components/common/GoogleMap";
 import Modal from "react-modal";
 import { useNavigate } from "react-router-dom";
 import SideBar from "../components/common/SideBar";
+import { useAuth } from "../AuthContext";
 
 const Background = styled.div`
   background-image: url("../img/trailsFormBackground.jpg");
@@ -293,7 +294,7 @@ const MapButtonContainer = styled.div`
 
 const SuggestTrail = () => {
   const navigate = useNavigate();
-  //TODO
+  const { userId } = useAuth();
   const [selectedLocation, setSelectedLocation] = useState({
     lat: "",
     lng: "",
@@ -388,10 +389,10 @@ const SuggestTrail = () => {
       });
 
       const trailImagesUrl = uploadResponse.data.imageUrl;
-
+      
       const postData = {
         trailName: trailData.trailName,
-        trailLat: selectedLocation.lat,
+        trailLat: selectedLocation.lat, 
         trailLng: selectedLocation.lng,
         trailType: trailData.trailType,
         trailDifficulty: trailData.trailDifficulty,
@@ -400,6 +401,7 @@ const SuggestTrail = () => {
         trailImagesUrl: trailImagesUrl,
         estimatedDuration: trailData.estimatedDuration,
         amenities: trailData.amenities,
+        userId: userId,
       };
 
       const postResponse = await axios.post("/api/trails", postData);

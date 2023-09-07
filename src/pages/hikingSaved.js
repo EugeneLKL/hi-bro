@@ -2,6 +2,7 @@ import React from "react";
 import styled, { keyframes } from "styled-components";
 import HikingDisplaySavedTrails from "../components/hikingSaved/HikingDisplaySavedTrails";
 import SideBar from "../components/common/SideBar";
+import { useParams } from "react-router-dom";
 
 const fadeIn = keyframes`
   to {
@@ -48,19 +49,21 @@ const SavedTitle = styled.h1`
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   margin-top: 20px;
+  top: 0;
+  position: absolute;
 `;
 
 const HikingSaved = () => {
   return (
     <div className="flex flex-row w-full">
       <SideBar />
-    <BackgroundContainer>
-      <BackgroundOverlay />
-      <ContentContainer>
-        <SavedTitle>Saved Trails</SavedTitle>
-        <HikingDisplaySavedTrails />
-      </ContentContainer>
-    </BackgroundContainer>
+      <BackgroundContainer>
+        <BackgroundOverlay />
+        <ContentContainer>
+          <SavedTitle>Saved Trails</SavedTitle>
+          <HikingDisplaySavedTrails />
+        </ContentContainer>
+      </BackgroundContainer>
     </div>
   );
 };
