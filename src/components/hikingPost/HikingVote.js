@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import styled from "styled-components";
 import { UpCircleOutlined, DownCircleOutlined } from "@ant-design/icons";
+import { useAuth } from "../../AuthContext";
 
 const VoteContainer = styled.div`
   display: flex;
@@ -84,13 +85,32 @@ const DownArrowButton = styled(DownCircleOutlined)`
 
 const HikingVote = ({ postId, containerStyle }) => {
   const [voteCounter, setVoteCounter] = useState(null);
+  const { userId } = useAuth(); 
 
   const StyledVoteContainer = styled(VoteContainer)`
     ${containerStyle}
   `;
 
-  const voteUp = () => {
-    setVoteCounter((prevVoteCounter) => prevVoteCounter + 1);
+  const voteUp = async () => {
+    try {
+      // Check if the user has already voted for this postId
+      const hasVotedResponse = await axios.get(`/api/votes/${postId}/hasVoted`, {
+        params: {
+          userId,
+        },
+      });
+
+      if (hasVotedResponse.data.hasVoted) {
+        // User has already voted, handle this case accordingly
+        return;
+      }
+
+      // User hasn't voted, allow them to vote
+      setVoteCounter((prevVoteCounter) => prevVoteCounter + 1);
+    } catch (error) {
+      console.error(error);
+      // Handle error, if needed
+    }
   };
 
   const voteDown = () => {

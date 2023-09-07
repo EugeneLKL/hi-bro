@@ -4,6 +4,9 @@ import Confirmation from "../common/HikingConfirmation";
 import "react-toastify/dist/ReactToastify.css";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { useAuth } from "../../AuthContext";
+import { useQuery } from "react-query";
+import { useParams } from "react-router-dom";
 
 const HikingCreatePost = ({ profileImage }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -12,6 +15,22 @@ const HikingCreatePost = ({ profileImage }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [images, setImages] = useState([]);
+  const { userId, profileImageUrl } = useAuth();
+  const [userImageUrl, setUserImageUrl] = useState("");
+
+  const { data: userData, isLoading } = useQuery(
+    ["user", userId],
+    async () => {
+      const response = await axios.get(`/api/getUserInfo/${userId}`);
+      console.log(response);
+      return response.data;
+    },
+    {
+      onSuccess: (data) => {
+        setUserImageUrl(data.profileImage);
+      },
+    }
+  );
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -58,7 +77,12 @@ const HikingCreatePost = ({ profileImage }) => {
 
       const imageUrl = uploadResponse.data.imageUrl;
 
-      const newPostData = { title, content, imageUrl };
+      const newPostData = {
+        title,
+        content,
+        imageUrl,
+        userId,
+      };
       const response = await axios.post("/api/posts", newPostData);
 
       console.log("New post created:", response.data);
@@ -72,12 +96,12 @@ const HikingCreatePost = ({ profileImage }) => {
 
       setTitle("");
       setContent("");
+      setImages([]);
       handleDialogClose();
 
       setTimeout(function () {
         window.location.reload();
       }, 2000);
-
     } catch (error) {
       console.error(error);
       toast.error("Failed to create post", {
@@ -113,7 +137,7 @@ const HikingCreatePost = ({ profileImage }) => {
 
   return (
     <div className="hiking-create-post">
-      <img className="profile-picture" src={profileImage} alt="User profile" />
+      <img className="profile-picture" src={userImageUrl} alt="profile" />
       <button
         className="create-post-box-button"
         onClick={handlePostButtonClick}

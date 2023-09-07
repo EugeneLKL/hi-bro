@@ -39,6 +39,7 @@ function App() {
   const [sidebarE, setSidebarE] = useState(false);
   const [sidebarC, setSidebarC] = useState(false);
   const [connector, setConnector] = useState(false);
+  const [currentPath, setCurrentPath] = useState("");
 
   const allowedPaths = ['/connector', '/register', '/'];
 
@@ -47,7 +48,7 @@ function App() {
     const isAllowedPath = allowedPaths.includes(currentPath);
 
     setConnector(!isAllowedPath);
-  }, []);
+  });
 
   return (
     <QueryClientProvider client={queryClient}>

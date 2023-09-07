@@ -1,11 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Confirmation from "../common/HikingConfirmation";
+import { useAuth } from "../../AuthContext";
+import { useQuery } from "react-query";
 
 const HikingCreateComment = ({ postId, profileImage }) => {
   const [comment, setComment] = useState("");
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+  const { userId } = useAuth();
+  const [userImageUrl, setUserImageUrl] = useState("");
+
+  const { data: userData, isLoading } = useQuery(
+    ["user", userId],
+    async () => {
+      const response = await axios.get(`/api/getUserInfo/${userId}`);
+      console.log(response);
+      return response.data;
+    },
+    {
+      onSuccess: (data) => {
+        setUserImageUrl(data.profileImage);
+      },
+    }
+  );
 
   const handleCommentChange = (event) => setComment(event.target.value);
 
@@ -19,7 +37,8 @@ const HikingCreateComment = ({ postId, profileImage }) => {
 
     try {
       const response = await axios.post(`/api/posts/${postId}/comments`, {
-        comment: comment,
+        userId,
+        comment,
       });
 
       console.log(response.data);
@@ -49,7 +68,7 @@ const HikingCreateComment = ({ postId, profileImage }) => {
 
   return (
     <div className="comment-form">
-      <img src={profileImage} alt="User profile" />
+      <img className="profile-picture" src={userImageUrl} alt="User profile" />
       <form onSubmit={handleSubmitComment}>
         <textarea
           className="comment-input"

@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios';
+import { useQuery } from 'react-query';
 
 const AuthContext = createContext();
 
@@ -19,16 +21,10 @@ export const AuthProvider = ({ children }) => {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
-    setUserId(null);
+    // setUserId(null);
     localStorage.setItem('isLoggedIn', 'false');
     localStorage.removeItem('userId');
   };
-
-  // Use useEffect to persist changes to local storage
-  useEffect(() => {
-    localStorage.setItem('profileImageUrl', profileImageUrl);
-    localStorage.setItem('userName', userName);
-  }, [profileImageUrl, userName]);
 
   return (
     <AuthContext.Provider value={{

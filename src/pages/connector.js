@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAuth } from "../AuthContext";
 
 const quotes = {
   hiking: "Hiking is not just a walk, it's a journey of the soul.",
@@ -9,10 +10,17 @@ const quotes = {
 const Connector = () => {
   const [hovered, setHovered] = useState("");
   const transitionDuration = "0.5s";
+  const { userId } = useAuth();
 
   const handleHover = (element) => {
     setHovered(element);
   };
+
+  useEffect(() => {
+    if (userId) {
+      console.log(userId)
+    }
+  }, [userId]);
 
   const handleHikingClick = () => {
     window.location.href = "/hikingDiscussion";

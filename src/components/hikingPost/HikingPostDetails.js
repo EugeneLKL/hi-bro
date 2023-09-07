@@ -14,6 +14,8 @@ import {
   LinkOutlined,
 } from "@ant-design/icons";
 import styled from "styled-components";
+import { useQuery } from "react-query";
+import { useAuth } from "../../AuthContext";
 
 const ShareIcon = styled(ShareAltOutlined)`
   margin-right: 10px;
@@ -53,7 +55,6 @@ const LinkIcon = styled(LinkOutlined)`
 const HikingPostDetails = ({
   postId,
   imageUrl,
-  username,
   title,
   content,
   isDetail,
@@ -72,17 +73,44 @@ const HikingPostDetails = ({
   const dialogRef = useRef(null);
   const editFormRef = useRef(null);
   const reportFormRef = useRef(null);
+  const [userImageUrl, setUserImageUrl] = useState("");
+  const [username, setUsername] = useState("");
+  const [isCreator, setIsCreator] = useState(false);
+  const [postUserId, setPostUserId] = useState(false);
+  const { userId } = useAuth();
+
+  const { data: postData, isLoading } = useQuery(
+    ["post", postId],
+    async () => {
+      const response = await axios.get(`/api/posts/${postId}`);
+      console.log(response);
+      return response.data;
+    },
+    {
+      onSuccess: (data) => {
+        setUserImageUrl(data[0].user.profileImage);
+        setUsername(data[0].user.userName);
+        setPostUserId(data[0].user.userId);
+      },
+    }
+  );
+
+  useEffect(() => {
+    console.log(userId, postUserId)
+    if (userId === postUserId) {
+      setIsCreator(true);
+    }
+  });
 
   const handleOptionClick = (e) => {
     e.preventDefault();
     setOptionDropdownOpen((prevState) => !prevState);
     setShareDropdownOpen(false);
   };
-  
 
   const handleShareClick = () => {
     setShareDropdownOpen((prevState) => !prevState);
-    setOptionDropdownOpen(false); 
+    setOptionDropdownOpen(false);
   };
 
   const handleCancel = useCallback(() => {
@@ -341,20 +369,24 @@ const HikingPostDetails = ({
 
   return (
     <div className="hiking-post">
-      <button className="post-options" onClick={handleOptionClick}>
-        <OptionIcon />
-      </button>
-      {optionDropdownOpen && (
-        <ul className="options-option-list">
-          <li onClick={handleEditButtonClick}>
-            <EditIcon />
-            <span>Edit</span>
-          </li>
-          <li onClick={handleDeleteButtonClick}>
-            <DeleteIcon />
-            <span>Delete</span>
-          </li>
-        </ul>
+      {isCreator && (
+        <div>
+          <button className="post-options" onClick={handleOptionClick}>
+            <OptionIcon />
+          </button>
+          {optionDropdownOpen && (
+            <ul className="options-option-list">
+              <li onClick={handleEditButtonClick}>
+                <EditIcon />
+                <span>Edit</span>
+              </li>
+              <li onClick={handleDeleteButtonClick}>
+                <DeleteIcon />
+                <span>Delete</span>
+              </li>
+            </ul>
+          )}
+        </div>
       )}
       {showModalEdit && (
         <Confirmation
@@ -389,11 +421,7 @@ const HikingPostDetails = ({
         />
       )}
       <div className="hiking-post-header">
-        <img
-          className="profile-image"
-          src="/img/profileIcon.png"
-          alt="profile"
-        />
+        <img className="profile-image" src={userImageUrl} alt="profile" />
         <h5 className="hiking-post-username">{username}</h5>
       </div>
       <h3 className="hiking-post-title">{title}</h3>

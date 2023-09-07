@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { ToastContainer } from "react-toastify";
 import SideBar from "../components/common/SideBar";
+import { useQuery } from "react-query";
 
 const PostPage = () => {
   const { postId } = useParams();
@@ -14,8 +15,6 @@ const PostPage = () => {
   const [posts, setPosts] = useState(undefined);
   const [comments, setComments] = useState(undefined);
   const navigate = useNavigate();
-
-  const username = "Steve";
 
   const handleDelete = async () => {
     try {
@@ -72,7 +71,6 @@ const PostPage = () => {
               <HikingPostDetails
                 key={post.postId}
                 postId={post.postId}
-                username={username} //post.username
                 title={post.title}
                 content={post.content}
                 imageUrl={post.imageUrl}

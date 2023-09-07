@@ -1,6 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import HikingVote from "../hikingPost/HikingVote";
+import { useAuth } from "../../AuthContext";
+import axios from "axios";
+import { useQuery } from "react-query";
+import { useParams } from "react-router-dom";
 
 const discussionContainer = `
   display: flex;
@@ -12,7 +16,23 @@ const discussionContainer = `
 //TODO - Add username
 const HikingPost = ({ title, content, imageUrl, postId }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const username = "Steve";
+  const [userImageUrl, setUserImageUrl] = useState("");
+  const [username, setUsername] = useState("");
+
+  const { data: postData, isLoading } = useQuery(
+    ["post", postId],
+    async () => {
+      const response = await axios.get(`/api/posts/${postId}`);
+      console.log(response);
+      return response.data;
+    },
+    {
+      onSuccess: (data) => {
+        setUserImageUrl(data[0].user.profileImage); 
+        setUsername(data[0].user.userName); 
+      },
+    }
+  );
 
   const handlePrevImage = (event) => {
     event.preventDefault();
@@ -30,15 +50,11 @@ const HikingPost = ({ title, content, imageUrl, postId }) => {
 
   return (
     <div className="hiking-post-container">
-      <HikingVote postId={postId} containerStyle={discussionContainer}/>
+      <HikingVote postId={postId} containerStyle={discussionContainer} />
       <Link to={`hikingPost/${postId}`} className="post-link">
         <div className="hiking-post">
           <div className="hiking-post-header">
-            <img
-              className="profile-image"
-              src="/img/profileIcon.png"
-              alt="profile"
-            />
+            <img className="profile-image" src={userImageUrl} alt="profile" />
             <h5 className="hiking-post-username">{username}</h5>
           </div>
           <h3 className="hiking-post-title">{title}</h3>

@@ -1,26 +1,27 @@
 import axios from "axios";
 import { useState, useEffect, useCallback } from "react";
+import { useQuery } from "react-query";
 
 const HikingPostComments = ({ postId }) => {
   const [comments, setComments] = useState([]);
   const [displayedComments, setDisplayedComments] = useState(5);
-  const profileImage = "/img/profileIcon.png";
-  const username = "Steve";
+  const [userImageUrl, setUserImageUrl] = useState([]);
+  const [username, setUsername] = useState([]);
 
-  const fetchComments = useCallback(async () => {
-    try {
-      const commentsUrl = `/api/posts/${postId}/comments`;
-      const response = await axios.get(commentsUrl);
-      setComments(response.data);
-    } catch (error) {
-      console.error(error);
-      // Handle the error or display an error message
+  const { data: commentsData, isLoading } = useQuery(
+    ["comments", postId],
+    async () => {
+      const response = await axios.get(`/api/posts/${postId}/comments`);
+      console.log(response);
+      return response.data;
+    },
+    {
+      onSuccess: (data) => {
+        setComments(data);
+        console.log(data);
+      },
     }
-  }, [postId]);
-
-  useEffect(() => {
-    fetchComments();
-  }, [fetchComments]);
+  );
 
   const handleShowMore = () => {
     setDisplayedComments((prevCount) => prevCount + 10);
@@ -32,8 +33,12 @@ const HikingPostComments = ({ postId }) => {
         <div key={comment.commentId}>
           <div className="comment">
             <div className="comment-header">
-              <img src={profileImage} alt="profile" />
-              <h5 className="comment-username">{username}</h5>
+              <img
+                className="profile-picture"
+                src={comment.user.profileImage}
+                alt="profile"
+              />
+              <h5 className="comment-username">{comment.user.userName}</h5>
             </div>
             <div className="comment-content">{comment.comment}</div>
           </div>
