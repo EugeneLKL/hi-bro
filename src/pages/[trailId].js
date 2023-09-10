@@ -14,6 +14,7 @@ import HikingForm from "../components/common/HikingForm";
 import HikingTrailReviews from "../components/hikingTrailsPage/HikingTrailReviews";
 import Confirmation from "../components/common/HikingConfirmation";
 import SideBar from "../components/common/SideBar";
+import { useAuth } from "../AuthContext";
 
 const MainContainer = styled.div`
   width: 100%;
@@ -458,7 +459,6 @@ const MapModal = styled.div`
 const TrailPage = () => {
   const { trailId } = useParams();
   const navigate = useNavigate();
-  const ratingAverage = "5";
   const [isEditMode, setIsEditMode] = useState(false);
   const [receivedTrailData, setReceivedTrailData] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState({});
@@ -472,6 +472,12 @@ const TrailPage = () => {
   const [makeReview, setMakeReview] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
   const dropdownRef = useRef(null);
+  const [ratingAverage, setRatingAverage] = useState(0);
+  const [rating, setRating] = useState(0);
+  const { userId } = useAuth();
+  const [reviews, setReviews] = useState(undefined);
+  const [isCreator, setIsCreator] = useState(false);
+  const [trailUserId, setTrailUserId] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -502,7 +508,22 @@ const TrailPage = () => {
     {
       onSuccess: (data) => {
         console.log(data);
-        setImagePreviews(data.trailImagesUrl);
+        // Calculate average rating
+        const ratings = data.trailRating;
+        console.log(ratings);
+        let total = 0;
+        for (let i = 0; i < ratings.length; i++) {
+          total += ratings[i].rating;
+        }
+        const average = total / ratings.length;
+        setRatingAverage(average.toFixed(1));
+        //set seleted rating based on user id
+        for (let i = 0; i < ratings.length; i++) {
+          if (ratings[i].userId === userId) {
+            setSelectedRating(ratings[i].rating);
+          }
+        }
+
         setTempLocation({
           lat: data.trailLat,
           lng: data.trailLng,
@@ -513,6 +534,7 @@ const TrailPage = () => {
         });
         setSelectedAmenities(data.amenities);
         setEstimatedDuration(data.estimatedDuration);
+        setTrailUserId(data.userId);
       },
     }
   );
@@ -552,32 +574,35 @@ const TrailPage = () => {
     }
   );
 
-  // const rateTrailMutation = useMutation(
-  //   async ({ trailId, rating }) => {
-  //     const response = await axios.post(`/api/trails/${trailId}/rating`, {
-  //       rating,
-  //     });
-  //     return response.data;
-  //   },
-  //   {
-  //     onSuccess: () => {
-  //       toast.success("Trail rated successfully!");
-  //     },
-  //   }
-  // );
+  // Post rating with user id
+  const rateTrailMutation = useMutation(
+    async (rating) => {
+      const response = await axios.post(`/api/trails/${trailId}/rating`, {
+        ...rating,
+        userId,
+      });
+      console.log(response);
+      return response.data;
+    },
+    {
+      onSuccess: () => {
+        toast.success("Trail rated successfully!");
+      },
+    }
+  );
 
-  // const updateMutation = useMutation(
-  //   async (editedData) => {
-  //     const response = await axios.put(`/api/trails/${trailId}`, editedData);
-  //     return response.data;
-  //   },
-  //   {
-  //     onSuccess: () => {
-  //       toast.success("Trail updated successfully!");
-  //       setIsEditMode(false);
-  //     },
-  //   }
-  // );
+  useEffect(() => {
+    if (reviewsData) {
+      setReviews(reviewsData);
+    }
+  }, [reviewsData]);
+
+  useEffect(() => {
+    console.log(userId, trailUserId);
+    if (userId === trailUserId) {
+      setIsCreator(true);
+    }
+  });
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -589,9 +614,10 @@ const TrailPage = () => {
   };
 
   // TODO - Create receive api for rating
-  const handleRatingSelect = async (rating) => {
-    // await rateTrailMutation.mutateAsync({ trailId, rating });
+  const handleRatingSelect = (rating) => {
+    console.log(rating);
     setSelectedRating(rating);
+    rateTrailMutation.mutateAsync({ rating: rating });
   };
 
   const handleEdit = () => {
@@ -700,14 +726,12 @@ const TrailPage = () => {
 
     if (field === "trailImages") {
       const previews = [];
-      for (const key in value) {
-        if (value.hasOwnProperty(key)) {
-          const image = value[key];
-          previews.push(URL.createObjectURL(image));
-        }
+
+      for (let i = 0; i < value.length; i++) {
+        previews.push(URL.createObjectURL(value[i]));
       }
+
       setImagePreviews(previews);
-      // console.log(previews)
     }
   };
 
@@ -800,25 +824,22 @@ const TrailPage = () => {
   };
 
   const handleReview = () => {
-    try {
-      const reviewData = {
-        reviewTitle: receivedTrailData.reviewTitle,
-        reviewContent: receivedTrailData.reviewContent,
-      };
+    const reviewData = {
+      reviewTitle: receivedTrailData.reviewTitle,
+      reviewContent: receivedTrailData.reviewContent,
+      userId,
+    };
 
-      const reviewResponse = axios.post(
-        `/api/trails/${trailId}/reviews`,
-        reviewData
-      );
-
-      toast.success("Review submitted successfully!");
-      window.location.reload(1000);
-    } catch (error) {
-      console.log(error);
-      toast.error("Failed to suggest trail");
-    }
-
-    closeReview();
+    axios
+      .post(`/api/trails/${trailId}/reviews`, reviewData)
+      .then((response) => {
+        console.log(response);
+        toast.success("Review submitted successfully!");
+        setMakeReview(false);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const confirmDelete = () => {
@@ -830,389 +851,398 @@ const TrailPage = () => {
     setIsDelete(false);
   };
 
+  const handleSave = () => {
+    axios
+      .post(`/api/trails/${trailId}/favorites`, {
+        userId,
+      })
+      .then((response) => {
+        console.log(response);
+        toast.success("Trail saved successfully!");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   return (
     <div className="flex flex-row w-full">
       <SideBar />
-    <MainContainer>
-      <ToastBox />
-      <PageContent>
-        <ImageSliderContainer>
-          {trailData.trailImagesUrl && (
-            <HikingImageSlider images={trailData.trailImagesUrl} />
-          )}
-        </ImageSliderContainer>
-        <BottomContainer>
-          <ContentContainer>
-            <TrailName>{trailData.trailName}</TrailName>
-            <TrailContent>{trailData.trailDescription}</TrailContent>
-            <TrailContent>
-              Location: {trailData.trailLat}, {trailData.trailLng}
-            </TrailContent>
-            <TrailContent>Type: {trailData.trailType}</TrailContent>
-            <TrailContent>Difficulty: {trailData.trailDifficulty}</TrailContent>
-            <TrailContent>Length: {trailData.trailLength}</TrailContent>
-            <TrailContent>Duration: {trailData.estimatedDuration}</TrailContent>
-            <TrailContent>Amenities:</TrailContent>
-            <AmenityList>
-              {trailData.amenities.map((amenity, index) => (
-                <AmenityItem key={index}>{amenity}</AmenityItem>
-              ))}
-            </AmenityList>
-          </ContentContainer>
-          <FunctionContainer>
-            <div>
-              <span>Trail rating:</span>
-              <div className="flex align-middle mb-2">
-                {/* TODO rating average */}
-                <div>({selectedRating})</div>
-                <div className="mt-0.5 ml-1">
-                  {[1, 2, 3, 4, 5].map((rating) => (
-                    <StyledRatingStar
-                      key={rating}
-                      selected={rating <= selectedRating}
-                      onClick={() => handleRatingSelect(rating)}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-            <ActionButton>Save trail</ActionButton>
-            <ActionButton onClick={handleEdit}>Edit Trail</ActionButton>
-            <ActionButton onClick={handleDelete}>Delete trail</ActionButton>
-            <ActionButton onClick={openReview}>Write a review</ActionButton>
-          </FunctionContainer>
-          <MapContainer>
-            <GoogleMap
-              key={trailData.trailId}
-              trailLat={trailData.trailLat}
-              trailLng={trailData.trailLng}
-              mapSearch={false}
-              w="100%"
-              h="315px"
-              streetViewControl={false}
-              onMarkerPositionChange={handleMarkerPositionChange}
-              draggable={false}
-              clickEnabled={false}
-            />
-          </MapContainer>
-        </BottomContainer>
-        <ReviewContainer>
-          <Title>Reviews</Title>
-          {reviewsLoading ? (
-            <div>Loading...</div>
-          ) : (
-            reviewsData.map((review) => (
-              <div className="rounded-md border mx-0 my-2.5 p-2.5 border-solid border-[#ccc]">
-                <div className="flex flex-row col-md-3 items-center mb-3">
-                  <img
-                    className="rounded-full w-10 h-10 object-cover"
-                    src="https://bootdey.com/img/Content/avatar/avatar1.png"
-                    alt="User image"
-                  />
-                  <h5 className="ml-2">
-                    <b>Username</b>
-                  </h5>
-                </div>
-                <div className="col-md-9">
-                  <h3 className="card-title">{review.reviewTitle}</h3>
-                  <p className="card-text">{review.reviewContent}</p>
-                </div>
-              </div>
-            ))
-          )}
-        </ReviewContainer>
-      </PageContent>
-      {isDelete && (
-        <Confirmation
-          message="Are you sure you want to delete this trail?"
-          onConfirm={confirmDelete}
-          onCancel={cancelDelete}
-        ></Confirmation>
-      )}
-      {makeReview && (
-        <Overlay className="overlay" onClick={handleOverlayClick}>
-          <HikingForm
-            formTitle={"Write a review"}
-            onCancel={closeReview}
-            onSubmit={handleReview}
-            leftBtn={"Submit"}
-            contentPlaceholder={"Write your review here..."}
-            handleTitleChange={handleTitleChange}
-            handleContentChange={handleContentChange}
-          ></HikingForm>
-        </Overlay>
-      )}
-      {isEditMode && (
-        <Overlay className="overlay" onClick={handleOverlayClick}>
-          <EditFormContainer>
-            <FormContainer>
-              <form onSubmit={handleEditFormSubmit}>
-                <Title>Edit Trail</Title>
-                <FormGroup>
-                  <Label>
-                    <RedAsterisk>*</RedAsterisk>Trail Name
-                  </Label>
-                  <Input
-                    type="text"
-                    name="trailName"
-                    defaultValue={trailData.trailName}
-                    onChange={(e) =>
-                      handleTrailFormChange("trailName", e.target.value)
-                    }
-                  />
-                  {/* {errors.trailName && <ErrorMsg>{errors.trailName}</ErrorMsg>} */}
-                </FormGroup>
-
-                <FormGroup>
-                  <Label>
-                    <RedAsterisk>*</RedAsterisk>Trail Location
-                  </Label>
-
-                  <MapButton type="button" onClick={openMap}>
-                    Open Map
-                  </MapButton>
-
-                  <div>
-                    <h4 className="mt-2">Selected Coordinates:</h4>
-                    <p>Latitude: {selectedLocation.lat}</p>
-                    <p>Longitude: {selectedLocation.lng}</p>
-                  </div>
-
-                  {isMapModalOpen && (
-                    <MapModal>
-                      <h2 className="mb-1">Select Location on Map</h2>
-                      <InnerMapContainer>
-                        <GoogleMap
-                          trailLat={selectedLocation.lat}
-                          trailLng={selectedLocation.lng}
-                          mapSearch={true}
-                          w="100%"
-                          h="670px"
-                          streetViewControl={false}
-                          onMarkerPositionChange={handleMarkerPositionChange}
-                          draggable={true}
-                          clickEnabled={true}
-                        />
-                        <MapButtonContainer>
-                          <SetLocationButton onClick={handleSetLocation}>
-                            Set Location
-                          </SetLocationButton>
-                          <CloseMapButton onClick={handleCloseMap}>
-                            Close Map
-                          </CloseMapButton>
-                        </MapButtonContainer>
-                      </InnerMapContainer>
-                    </MapModal>
-                  )}
-                </FormGroup>
-
-                <FormGroup>
-                  <Label>
-                    <RedAsterisk>*</RedAsterisk>Trail Type
-                  </Label>
-                  <TrailSelect
-                    name="trailType"
-                    defaultValue={trailData.trailType}
-                    onChange={(e) =>
-                      handleTrailFormChange("trailType", e.target.value)
-                    }
-                  >
-                    <option value="">Select Trail Type</option>
-                    <option value={"Day Hike Trail"}>Day Hike Trail</option>
-                    <option value={"Long-Distance Trail"}>
-                      Long-Distance Trail
-                    </option>
-                    <option value={"Loop Trail"}>Loop Trail</option>
-                    <option value={"Point-to-Point Trail"}>
-                      Point-to-Point Trail
-                    </option>
-                    <option value={"Mountain Trail"}>Mountain Trail</option>
-                    <option value={"Coastal Trail"}>Coastal Trail</option>
-                    <option value={"Forest Trail"}>Forest Trail</option>
-                    <option value={"Desert Trail"}>Desert Trail</option>
-                    <option value={"Waterfall Trail"}>Waterfall Trail</option>
-                    <option value={"Canyon Trail"}>Canyon Trail</option>
-                    <option value={"Wilderness Trail"}>Wilderness Trail</option>
-                    <option value={"Heritage Trail"}>Heritage Trail</option>
-                    <option value={"Family Friendly Trail"}>
-                      Family-Friendly Trail
-                    </option>
-                    <option value={"Themed Trail"}>Themed Trail</option>
-                  </TrailSelect>
-                  {/* {errors.trailType && <ErrorMsg>{errors.trailType}</ErrorMsg>} */}
-                </FormGroup>
-
-                <FormGroup>
-                  <Label>
-                    <RedAsterisk>*</RedAsterisk>Trail Difficulty
-                  </Label>
-                  <TrailSelect
-                    name="trailDifficulty"
-                    defaultValue={trailData.trailDifficulty}
-                    onChange={(e) =>
-                      handleTrailFormChange("trailDifficulty", e.target.value)
-                    }
-                  >
-                    <option value="">Select Trail Difficulty</option>
-                    <option value={"Easy"}>Easy</option>
-                    <option value={"Moderate"}>Moderate</option>
-                    <option value={"Hard"}>Hard</option>
-                    <option value={"Expert"}>Expert</option>
-                  </TrailSelect>
-                  {/* {errors.trailDifficulty && (
-                    <ErrorMsg>{errors.trailDifficulty}</ErrorMsg>
-                  )} */}
-                </FormGroup>
-
-                <FormGroup>
-                  <Label>
-                    <RedAsterisk>*</RedAsterisk>Trail Length
-                  </Label>
-                  <TrailSelect
-                    name="trailLength"
-                    defaultValue={trailData.trailLength}
-                    onChange={(e) => {
-                      const selectedTrailLength = e.target.value;
-                      const newEstimatedDuration =
-                        calculateEstimatedDuration(selectedTrailLength);
-                      setReceivedTrailData((prevData) => ({
-                        ...prevData,
-                        trailLength: selectedTrailLength,
-                        estimatedDuration: newEstimatedDuration,
-                      }));
-                      setEstimatedDuration(newEstimatedDuration);
-                    }}
-                  >
-                    <option value="">Select Trail Length</option>
-                    <option value={"Short"}>Short (~3.2km)</option>
-                    <option value={"Moderate"}>Moderate (3.2 to 8km)</option>
-                    <option value={"Intermediate"}>
-                      Intermediate (8 to 16 km)
-                    </option>
-                    <option value={"Longer"}>Longer (16 to 32 km)</option>
-                    <option value={"Extended"}>Extended (32+ km)</option>
-                  </TrailSelect>
-                  {/* {errors.trailLength && (
-                    <ErrorMsg>{errors.trailLength}</ErrorMsg>
-                  )} */}
-                </FormGroup>
-
-                <FormGroup>
-                  <Label>Estimated Duration</Label>
-                  <Input
-                    type="text"
-                    name="estimatedDuration"
-                    value={estimatedDuration}
-                    onChange={() => {}}
-                    disabled
-                  />
-                </FormGroup>
-
-                <FormGroup>
-                  <Label>
-                    <RedAsterisk>*</RedAsterisk>Trail Description
-                  </Label>
-                  <TextArea
-                    name="trailDescription"
-                    defaultValue={trailData.trailDescription}
-                    onChange={(e) =>
-                      handleTrailFormChange("trailDescription", e.target.value)
-                    }
-                  />
-                  {/* {errors.trailDescription && (
-                    <ErrorMsg>{errors.trailDescription}</ErrorMsg>
-                  )} */}
-                </FormGroup>
-
-                <FormGroup>
-                  <Label>Amenities (Optional)</Label>
-                  <CheckboxDropdown ref={dropdownRef}>
-                    <DropdownToggle onClick={toggleDropdown}>
-                      {dropdownOpen ? "Select Amenities" : "Select Amenities ▼"}
-                    </DropdownToggle>
-                    {dropdownOpen && (
-                      <DropdownContent>
-                        {amenityOptions.map((amenity) => (
-                          <CheckboxLabel key={amenity}>
-                            <CheckboxInput
-                              type="checkbox"
-                              name="amenities"
-                              value={amenity}
-                              checked={selectedAmenities.includes(amenity)}
-                              onChange={(e) => {
-                                const { checked, value } = e.target;
-                                if (checked) {
-                                  setSelectedAmenities((prevAmenities) => [
-                                    ...prevAmenities,
-                                    value,
-                                  ]);
-                                } else {
-                                  setSelectedAmenities((prevAmenities) =>
-                                    prevAmenities.filter(
-                                      (amenity) => amenity !== value
-                                    )
-                                  );
-                                }
-                                handleTrailFormChange("amenities", [
-                                  ...selectedAmenities,
-                                  value,
-                                ]);
-                              }}
-                            />
-                            {amenity}
-                          </CheckboxLabel>
-                        ))}
-                      </DropdownContent>
-                    )}
-                  </CheckboxDropdown>
-                  <SelectedAmenitiesBox>
-                    {selectedAmenities.map((selectedAmenity, index) => (
-                      <SelectedAmenity key={index}>
-                        {selectedAmenity}
-                        <RemoveIcon
-                          onClick={() => handleRemoveAmenity(selectedAmenity)}
-                        >
-                          x
-                        </RemoveIcon>
-                      </SelectedAmenity>
-                    ))}
-                  </SelectedAmenitiesBox>
-                </FormGroup>
-
-                <FormGroup>
-                  <Label>
-                    <RedAsterisk>*</RedAsterisk>Trail Images
-                  </Label>
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    name="trailImages"
-                    onChange={(e) =>
-                      handleTrailFormChange("trailImages", e.target.files)
-                    }
-                    multiple
-                  />
-                  <ImagePreviewContainer>
-                    {imagePreviews.map((imagePreview, index) => (
-                      <ImagePreview
-                        key={index}
-                        src={imagePreview}
-                        alt="Trail Image"
+      <MainContainer>
+        <ToastBox />
+        <PageContent>
+          <ImageSliderContainer>
+            {trailData.trailImagesUrl && (
+              <HikingImageSlider images={trailData.trailImagesUrl} />
+            )}
+          </ImageSliderContainer>
+          <BottomContainer>
+            <ContentContainer>
+              <TrailName>{trailData.trailName}</TrailName>
+              <TrailContent>{trailData.trailDescription}</TrailContent>
+              <TrailContent>
+                Location: {trailData.trailLat}, {trailData.trailLng}
+              </TrailContent>
+              <TrailContent>Type: {trailData.trailType}</TrailContent>
+              <TrailContent>
+                Difficulty: {trailData.trailDifficulty}
+              </TrailContent>
+              <TrailContent>Length: {trailData.trailLength}</TrailContent>
+              <TrailContent>
+                Duration: {trailData.estimatedDuration}
+              </TrailContent>
+              <TrailContent>Amenities:</TrailContent>
+              <AmenityList>
+                {trailData.amenities.map((amenity, index) => (
+                  <AmenityItem key={index}>{amenity}</AmenityItem>
+                ))}
+              </AmenityList>
+            </ContentContainer>
+            <FunctionContainer>
+              <div>
+                <span>Trail rating:</span>
+                <div className="flex align-middle mb-2">
+                  <div>({ratingAverage})</div>
+                  <div className="mt-0.5 ml-1">
+                    {[1, 2, 3, 4, 5].map((rating) => (
+                      <StyledRatingStar
+                        key={rating}
+                        selected={rating <= selectedRating}
+                        onClick={() => handleRatingSelect(rating)}
                       />
                     ))}
-                  </ImagePreviewContainer>
-                </FormGroup>
+                  </div>
+                </div>
+              </div>
+              <ActionButton onClick={handleSave}>Save trail</ActionButton>
+              {isCreator && (
+                <div>
+                  <ActionButton onClick={handleEdit}>Edit Trail</ActionButton>
+                  <ActionButton onClick={handleDelete}>
+                    Delete trail
+                  </ActionButton>
+                </div>
+              )}
+              <ActionButton onClick={openReview}>Write a review</ActionButton>
+            </FunctionContainer>
+            <MapContainer>
+              <GoogleMap
+                key={trailData.trailId}
+                trailLat={trailData.trailLat}
+                trailLng={trailData.trailLng}
+                mapSearch={false}
+                w="100%"
+                h="315px"
+                streetViewControl={false}
+                onMarkerPositionChange={handleMarkerPositionChange}
+                draggable={false}
+                clickEnabled={false}
+              />
+            </MapContainer>
+          </BottomContainer>
+          <ReviewContainer>
+            <Title>Reviews</Title>
+            <HikingTrailReviews trailId={trailId} reviews={reviews} />
+          </ReviewContainer>
+        </PageContent>
+        {isDelete && (
+          <Confirmation
+            message="Are you sure you want to delete this trail?"
+            onConfirm={confirmDelete}
+            onCancel={cancelDelete}
+          ></Confirmation>
+        )}
+        {makeReview && (
+          <Overlay className="overlay" onClick={handleOverlayClick}>
+            <HikingForm
+              formTitle={"Write a review"}
+              onCancel={closeReview}
+              onSubmit={handleReview}
+              leftBtn={"Submit"}
+              contentPlaceholder={"Write your review here..."}
+              handleTitleChange={handleTitleChange}
+              handleContentChange={handleContentChange}
+            ></HikingForm>
+          </Overlay>
+        )}
+        {isEditMode && (
+          <Overlay className="overlay" onClick={handleOverlayClick}>
+            <EditFormContainer>
+              <FormContainer>
+                <form onSubmit={handleEditFormSubmit}>
+                  <Title>Edit Trail</Title>
+                  <FormGroup>
+                    <Label>
+                      <RedAsterisk>*</RedAsterisk>Trail Name
+                    </Label>
+                    <Input
+                      type="text"
+                      name="trailName"
+                      defaultValue={trailData.trailName}
+                      onChange={(e) =>
+                        handleTrailFormChange("trailName", e.target.value)
+                      }
+                    />
+                    {/* {errors.trailName && <ErrorMsg>{errors.trailName}</ErrorMsg>} */}
+                  </FormGroup>
 
-                <FormButtons>
-                  <SubmitButton type="submit">Edit</SubmitButton>
-                  <CancelButton onClick={handleCancel}>Cancel</CancelButton>
-                </FormButtons>
-              </form>
-            </FormContainer>
-          </EditFormContainer>
-        </Overlay>
-      )}
-    </MainContainer>
+                  <FormGroup>
+                    <Label>
+                      <RedAsterisk>*</RedAsterisk>Trail Location
+                    </Label>
+
+                    <MapButton type="button" onClick={openMap}>
+                      Open Map
+                    </MapButton>
+
+                    <div>
+                      <h4 className="mt-2">Selected Coordinates:</h4>
+                      <p>Latitude: {selectedLocation.lat}</p>
+                      <p>Longitude: {selectedLocation.lng}</p>
+                    </div>
+
+                    {isMapModalOpen && (
+                      <MapModal>
+                        <h2 className="mb-1">Select Location on Map</h2>
+                        <InnerMapContainer>
+                          <GoogleMap
+                            trailLat={selectedLocation.lat}
+                            trailLng={selectedLocation.lng}
+                            mapSearch={true}
+                            w="100%"
+                            h="670px"
+                            streetViewControl={false}
+                            onMarkerPositionChange={handleMarkerPositionChange}
+                            draggable={true}
+                            clickEnabled={true}
+                          />
+                          <MapButtonContainer>
+                            <SetLocationButton onClick={handleSetLocation}>
+                              Set Location
+                            </SetLocationButton>
+                            <CloseMapButton onClick={handleCloseMap}>
+                              Close Map
+                            </CloseMapButton>
+                          </MapButtonContainer>
+                        </InnerMapContainer>
+                      </MapModal>
+                    )}
+                  </FormGroup>
+
+                  <FormGroup>
+                    <Label>
+                      <RedAsterisk>*</RedAsterisk>Trail Type
+                    </Label>
+                    <TrailSelect
+                      name="trailType"
+                      defaultValue={trailData.trailType}
+                      onChange={(e) =>
+                        handleTrailFormChange("trailType", e.target.value)
+                      }
+                    >
+                      <option value="">Select Trail Type</option>
+                      <option value={"Day Hike Trail"}>Day Hike Trail</option>
+                      <option value={"Long-Distance Trail"}>
+                        Long-Distance Trail
+                      </option>
+                      <option value={"Loop Trail"}>Loop Trail</option>
+                      <option value={"Point-to-Point Trail"}>
+                        Point-to-Point Trail
+                      </option>
+                      <option value={"Mountain Trail"}>Mountain Trail</option>
+                      <option value={"Coastal Trail"}>Coastal Trail</option>
+                      <option value={"Forest Trail"}>Forest Trail</option>
+                      <option value={"Desert Trail"}>Desert Trail</option>
+                      <option value={"Waterfall Trail"}>Waterfall Trail</option>
+                      <option value={"Canyon Trail"}>Canyon Trail</option>
+                      <option value={"Wilderness Trail"}>
+                        Wilderness Trail
+                      </option>
+                      <option value={"Heritage Trail"}>Heritage Trail</option>
+                      <option value={"Family Friendly Trail"}>
+                        Family-Friendly Trail
+                      </option>
+                      <option value={"Themed Trail"}>Themed Trail</option>
+                    </TrailSelect>
+                    {/* {errors.trailType && <ErrorMsg>{errors.trailType}</ErrorMsg>} */}
+                  </FormGroup>
+
+                  <FormGroup>
+                    <Label>
+                      <RedAsterisk>*</RedAsterisk>Trail Difficulty
+                    </Label>
+                    <TrailSelect
+                      name="trailDifficulty"
+                      defaultValue={trailData.trailDifficulty}
+                      onChange={(e) =>
+                        handleTrailFormChange("trailDifficulty", e.target.value)
+                      }
+                    >
+                      <option value="">Select Trail Difficulty</option>
+                      <option value={"Easy"}>Easy</option>
+                      <option value={"Moderate"}>Moderate</option>
+                      <option value={"Hard"}>Hard</option>
+                      <option value={"Expert"}>Expert</option>
+                    </TrailSelect>
+                    {/* {errors.trailDifficulty && (
+                    <ErrorMsg>{errors.trailDifficulty}</ErrorMsg>
+                  )} */}
+                  </FormGroup>
+
+                  <FormGroup>
+                    <Label>
+                      <RedAsterisk>*</RedAsterisk>Trail Length
+                    </Label>
+                    <TrailSelect
+                      name="trailLength"
+                      defaultValue={trailData.trailLength}
+                      onChange={(e) => {
+                        const selectedTrailLength = e.target.value;
+                        const newEstimatedDuration =
+                          calculateEstimatedDuration(selectedTrailLength);
+                        setReceivedTrailData((prevData) => ({
+                          ...prevData,
+                          trailLength: selectedTrailLength,
+                          estimatedDuration: newEstimatedDuration,
+                        }));
+                        setEstimatedDuration(newEstimatedDuration);
+                      }}
+                    >
+                      <option value="">Select Trail Length</option>
+                      <option value={"Short"}>Short (~3.2km)</option>
+                      <option value={"Moderate"}>Moderate (3.2 to 8km)</option>
+                      <option value={"Intermediate"}>
+                        Intermediate (8 to 16 km)
+                      </option>
+                      <option value={"Longer"}>Longer (16 to 32 km)</option>
+                      <option value={"Extended"}>Extended (32+ km)</option>
+                    </TrailSelect>
+                    {/* {errors.trailLength && (
+                    <ErrorMsg>{errors.trailLength}</ErrorMsg>
+                  )} */}
+                  </FormGroup>
+
+                  <FormGroup>
+                    <Label>Estimated Duration</Label>
+                    <Input
+                      type="text"
+                      name="estimatedDuration"
+                      value={estimatedDuration}
+                      onChange={() => {}}
+                      disabled
+                    />
+                  </FormGroup>
+
+                  <FormGroup>
+                    <Label>
+                      <RedAsterisk>*</RedAsterisk>Trail Description
+                    </Label>
+                    <TextArea
+                      name="trailDescription"
+                      defaultValue={trailData.trailDescription}
+                      onChange={(e) =>
+                        handleTrailFormChange(
+                          "trailDescription",
+                          e.target.value
+                        )
+                      }
+                    />
+                    {/* {errors.trailDescription && (
+                    <ErrorMsg>{errors.trailDescription}</ErrorMsg>
+                  )} */}
+                  </FormGroup>
+
+                  <FormGroup>
+                    <Label>Amenities (Optional)</Label>
+                    <CheckboxDropdown ref={dropdownRef}>
+                      <DropdownToggle onClick={toggleDropdown}>
+                        {dropdownOpen
+                          ? "Select Amenities"
+                          : "Select Amenities ▼"}
+                      </DropdownToggle>
+                      {dropdownOpen && (
+                        <DropdownContent>
+                          {amenityOptions.map((amenity) => (
+                            <CheckboxLabel key={amenity}>
+                              <CheckboxInput
+                                type="checkbox"
+                                name="amenities"
+                                value={amenity}
+                                checked={selectedAmenities.includes(amenity)}
+                                onChange={(e) => {
+                                  const { checked, value } = e.target;
+                                  if (checked) {
+                                    setSelectedAmenities((prevAmenities) => [
+                                      ...prevAmenities,
+                                      value,
+                                    ]);
+                                  } else {
+                                    setSelectedAmenities((prevAmenities) =>
+                                      prevAmenities.filter(
+                                        (amenity) => amenity !== value
+                                      )
+                                    );
+                                  }
+                                  handleTrailFormChange("amenities", [
+                                    ...selectedAmenities,
+                                    value,
+                                  ]);
+                                }}
+                              />
+                              {amenity}
+                            </CheckboxLabel>
+                          ))}
+                        </DropdownContent>
+                      )}
+                    </CheckboxDropdown>
+                    <SelectedAmenitiesBox>
+                      {selectedAmenities.map((selectedAmenity, index) => (
+                        <SelectedAmenity key={index}>
+                          {selectedAmenity}
+                          <RemoveIcon
+                            onClick={() => handleRemoveAmenity(selectedAmenity)}
+                          >
+                            x
+                          </RemoveIcon>
+                        </SelectedAmenity>
+                      ))}
+                    </SelectedAmenitiesBox>
+                  </FormGroup>
+
+                  <FormGroup>
+                    <Label>
+                      <RedAsterisk>*</RedAsterisk>Trail Images
+                    </Label>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      name="trailImages"
+                      onChange={(e) =>
+                        handleTrailFormChange("trailImages", e.target.files)
+                      }
+                      multiple
+                    />
+                    <ImagePreviewContainer>
+                      {imagePreviews.map((imagePreview, index) => (
+                        <ImagePreview
+                          key={index}
+                          src={imagePreview}
+                          alt="Trail Image"
+                        />
+                      ))}
+                    </ImagePreviewContainer>
+                  </FormGroup>
+
+                  <FormButtons>
+                    <SubmitButton type="submit">Edit</SubmitButton>
+                    <CancelButton onClick={handleCancel}>Cancel</CancelButton>
+                  </FormButtons>
+                </form>
+              </FormContainer>
+            </EditFormContainer>
+          </Overlay>
+        )}
+      </MainContainer>
     </div>
   );
 };
