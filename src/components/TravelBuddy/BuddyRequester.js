@@ -1,13 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/icons';
-import { BiSolidUser, BiDetail } from 'react-icons/bi'
-import { SlCalender, SlLocationPin, SlInfo, } from 'react-icons/sl'
-import { TbGenderMale, TbGenderFemale } from 'react-icons/tb'
-import { Card, Col, Row, Button, Avatar, Image } from 'antd'; // Import Button from antd
+import { BiSolidUser, BiDetail } from 'react-icons/bi';
+import { SlCalender, SlLocationPin, SlInfo } from 'react-icons/sl';
+import { TbGenderMale, TbGenderFemale } from 'react-icons/tb';
+import { Card, Col, Row, Button, Avatar, Image } from 'antd';
 import axios from 'axios';
 import { useAuth } from '../../AuthContext';
 
 const { Meta } = Card;
+
+const cardStyle = {
+    width: 350,
+    marginBottom: '16px',
+};
+
+const avatarIconStyle = {
+    marginRight: '8px',
+};
+
+const genderIconStyle = {
+    marginLeft: '8px',
+};
+
+const buttonStyle = {
+    borderRadius: '4px',
+    margin: '5px',
+};
 
 const BuddyRequester = () => {
     const { userId } = useAuth();
@@ -110,110 +127,65 @@ const BuddyRequester = () => {
         });
     });
 
+    const renderCard = (requestedPost) => (
+        <Col key={requestedPost.post.travelPostId} span={8}>
+            <Card
+                style={cardStyle}
+                cover={
+                    <Image
+                        src={requestedPost.requester.profileImage}
+                        alt="Profile"
+                        width={350}
+                        height={200}
+                        style={{ objectFit: 'cover', overflow: 'hidden' }}
+                    />
+                }
+                actions={[
+                    <Button 
+                        style={{ ...buttonStyle, border:'None'}} 
+                        onClick={() => handleAccept(requestedPost.post.travelPostId, requestedPost.requester.userId)}
+                    >
+                        Accept
+                    </Button>,
+                    <Button 
+                        style={{ ...buttonStyle, border:'None'}} 
+                        onClick={() => handleReject(requestedPost.post.travelPostId)}
+                    >
+                        Reject
+                    </Button>,
+                ]}
+            >
+                <Meta
+                    title={
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                            <BiSolidUser style={avatarIconStyle} />
+                            {requestedPost.requester.userName}
+                            {requestedPost.requester.gender === 'Male' ? <TbGenderMale style={genderIconStyle} /> : <TbGenderFemale style={genderIconStyle} />}
+                        </span>
+                    }
+                    description={
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                            <SlCalender style={{ marginRight: '10px' }} />
+                            {formatDate(requestedPost.post.startDate)} - {formatDate(requestedPost.post.endDate)} ({calculateTripDuration(requestedPost.post.startDate, requestedPost.post.endDate)} Days)
+                        </span>
+                    }
+                />
+            </Card>
+        </Col>
+    );
+    
+
     return (
         <div>
-
-            <h2>See who wanna be your buddy:</h2>
+            <h2>See who wants to be your buddy:</h2>
             {Object.keys(groupedPostsByDestinationAndDate).map(destination => (
                 <div key={destination}>
                     <h3>{destination}</h3>
                     {Object.keys(groupedPostsByDestinationAndDate[destination]).map(date => (
                         <div key={date}>
                             <h4>{date}</h4>
-                            <Row
-                                gutter={[24, 24]}
-                                style={{
-                                    display: 'flex',
-                                }}
-                            >
-                                {groupedPostsByDestinationAndDate[destination][date].map(requestedPost => (
-                                    <Col
-                                        key={requestedPost.post.travelPostId}
-                                        span={8}
-                                    >
-                                        <Card
-                                            style={{
-                                                width: 350,
-                                            }}
-                                            cover={
-                                                <Image
-                                                    src={requestedPost.requester.profileImage}
-                                                    alt="example"
-                                                    width={350}
-                                                    height={200}
-                                                    // Hide overflow
-                                                    style={{
-                                                        objectFit: 'cover',
-                                                        overflow: 'hidden',
-                                                    }}
-
-                                                />
-                                            }
-                                            actions={[
-                                                <SlCalender onClick={() => handleAccept(requestedPost.post.travelPostId, requestedPost.requester.userId)} />,
-                                                <Button onClick={() => handleReject(requestedPost.post.travelPostId)}>Reject</Button>,
-                                            ]}
-                                        >
-                                            <Meta
-                                                // avatar={<Avatar src="https://xsgames.co/randomusers/avatar.php?g=pixel" />}
-                                                title={
-                                                    <span
-                                                        style={{
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                        }}>
-
-                                                        <BiSolidUser
-                                                            style={{
-                                                                marginRight: '8px'
-                                                            }} />
-                                                        {requestedPost.requester.userName}
-
-                                                        {requestedPost.requester.gender === 'Male' ? (
-                                                            <TbGenderMale
-                                                                style={{
-                                                                    marginLeft: '8px'
-                                                                }}
-                                                            />
-                                                        ) : (
-                                                            <TbGenderFemale
-                                                                style={{
-                                                                    marginLeft: '8px'
-                                                                }}
-                                                            />
-                                                        )}
-                                                    </span>
-                                                }
-                                                description={
-                                                    <span
-                                                        style={{
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                        }}>
-                                                        <SlCalender style={{
-                                                            marginRight: '10px',
-                                                        }} />
-                                                        {formatDate(requestedPost.post.startDate)} - {formatDate(requestedPost.post.endDate)}
-                                                        {/* Make a space */}
-                                                        {'  '}
-                                                        ({calculateTripDuration(requestedPost.post.startDate, requestedPost.post.endDate)} Days)
-                                                    </span>
-                                                }
-                                            />
-                                        </Card>
-                                        <p>Post ID: {requestedPost.post.travelPostId}</p>
-                                        <p>Requester: {requestedPost.requester.userName}</p>
-                                        <p>Destination: {requestedPost.post.destination}</p>
-                                        <p>Buddy Found: {requestedPost.post.buddyFound ? 'Yes' : 'No'}</p>
-                                        {/* Add buttons for accept and reject */}
-                                        {!requestedPost.post.buddyFound && (
-                                            <div>
-                                                <Button onClick={() => handleAccept(requestedPost.post.travelPostId, requestedPost.requester.userId)}>Accept</Button>
-                                                <Button onClick={() => handleReject(requestedPost.post.travelPostId, requestedPost.requester.userId)}>Reject</Button>
-                                            </div>
-                                        )}
-                                    </Col>
-                                ))}
+                            <Row gutter={[24, 24]} style={{ display: 'flex' }}>
+                                {groupedPostsByDestinationAndDate[destination][date].map(requestedPost => renderCard(requestedPost))}
                             </Row>
                         </div>
                     ))}

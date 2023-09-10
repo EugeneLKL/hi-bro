@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Col, Row } from 'antd';
+import { Card, Col, Row, Button } from 'antd';
 import axios from 'axios';
 import { useAuth } from '../../AuthContext';
 
@@ -15,7 +15,7 @@ const BuddyMatched = () => {
                 const filteredBuddies = response.data.filter(buddy =>
                     buddy.creator.userId === userId || buddy.buddyId === userId
                 );
-                
+
                 setMatchedBuddies(filteredBuddies);
             } catch (error) {
                 console.log(error);
@@ -23,9 +23,27 @@ const BuddyMatched = () => {
         }
 
         fetchBuddyMatched();
-    }, []); 
+    }, []);
 
-    return ( 
+    const handleUnpair = async (buddyId) => {
+        try {
+            const response = await axios.post('/api/unpairBuddy', { buddyId });
+
+            if (response.status === 200) {
+                // Remove the unpaired buddy from the local state
+                setMatchedBuddies(prevBuddies =>
+                    prevBuddies.filter(buddy => buddy.id !== buddyId)
+                );
+            } else {
+                console.log("Failed to unpair:", response.data.message);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+
+    return (
         <div>
             <h2>Matched Buddies</h2>
             <Row gutter={[16, 16]}>
@@ -35,12 +53,19 @@ const BuddyMatched = () => {
                             <p>Name: {buddy.creator.userName}</p>
                             <p>Email: {buddy.creator.userEmail}</p>
                             {/* Other buddy information */}
+
+
+                            <Button type="primary" onClick={() => handleUnpair(buddy.id)}>
+                                Unpair Buddy
+                            </Button>
+
                         </Card>
+
                     </Col>
                 ))}
             </Row>
         </div>
-     );
+    );
 }
- 
+
 export default BuddyMatched;
