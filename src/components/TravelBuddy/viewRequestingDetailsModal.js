@@ -253,7 +253,7 @@ const ViewRequestingDetailsModal = ({ visible, onClose, travel }) => {
 <Space size={[0, 8]} wrap>
     {travel.buddyPreference.map((preference, index) => (
         <Tag key={index} color="cyan">{preference}</Tag>
-    ))}
+        ))}
 </Space>
 
 {travel.additionalInfo && (
