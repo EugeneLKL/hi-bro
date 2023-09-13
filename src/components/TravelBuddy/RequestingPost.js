@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Col, Row, Button, Modal, Avatar, Space, Image } from 'antd';
+import { Card, Col, Row, Button, Modal, Pagination, Avatar, Space, Image } from 'antd';
 import { AiFillCheckCircle, AiFillCloseCircle, AiOutlineClockCircle } from 'react-icons/ai';
 import { MdOutlineTravelExplore } from 'react-icons/md';
 import { CiCalendarDate, CiSquareInfo, CiUser } from 'react-icons/ci';
@@ -16,6 +16,15 @@ const RequestingPost = () => {
     const [cancelledRequests, setCancelledRequests] = useState([]); // New state to track cancelled requests
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [currentDetails, setCurrentDetails] = useState(null);
+    const [requestStatus, setRequestStatus] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [postsPerPage] = useState(6);
+
+
+    const indexOfLastPost = currentPage * postsPerPage;
+    const indexOfFirstPost = indexOfLastPost - postsPerPage;
+    const currentPosts = pendingRequests.slice(indexOfFirstPost, indexOfLastPost);
+
 
 
 
@@ -48,17 +57,16 @@ const RequestingPost = () => {
         });
     };
 
-    const handleViewUserDetails = (travelDetails) => {
+    const handleViewUserDetails = (travelDetails, requestStatus) => {
         setCurrentDetails(travelDetails);
+        setRequestStatus(requestStatus);
     };
 
 
     const handleCloseModal = () => {
         setCurrentDetails(null);
+        setRequestStatus('');
     };
-
-
-
 
     const getStatusIcon = (requestStatus) => {
         switch (requestStatus) {
@@ -76,7 +84,7 @@ const RequestingPost = () => {
     return (
         <div style={{ width: '100%' }}>
             <Row gutter={[16, 16]} style={{ display: 'flex' }}>
-                {pendingRequests.map((request) => (
+                {currentPosts.map((request) => (
                     <Col key={request.post.travelPostId} span={12}>
                         <Card
                             style={{
@@ -172,21 +180,9 @@ const RequestingPost = () => {
                                     'He/She is still searching for a buddy . . .'}
                             </span>
 
-
                             <Button
-                                danger
-                                onClick={() => handleCancelRequest(request.buddyRequestId)}
-                                disabled={cancelledRequests.includes(request.buddyRequestId) || request.requestStatus === 'Rejected' || request.requestStatus === 'Accepted'}
-                                style={{ position: 'absolute', right: '160px', bottom: '10px' }}
-
-                            >
-                                {cancelledRequests.includes(request.buddyRequestId) ? 'Cancelled' : 'Cancel'}
-                            </Button>
-
-                            <Button
-                                onClick={() => handleViewUserDetails(request.post)}
-                                style={{ position: 'absolute', right: '20px', bottom: '10px' }}
-
+                                onClick={() => handleViewUserDetails(request.post, request.requestStatus)}
+                                style={{ position: 'absolute', right: '110px', bottom: '10px' }}
                             >
                                 <span
                                     style={{
@@ -203,6 +199,18 @@ const RequestingPost = () => {
 
                             </Button>
 
+                            <Button
+                                danger
+                                onClick={() => handleCancelRequest(request.buddyRequestId)}
+                                disabled={cancelledRequests.includes(request.buddyRequestId) || request.requestStatus === 'Rejected' || request.requestStatus === 'Accepted'}
+                                style={{ position: 'absolute', right: '20px', bottom: '10px' }}
+
+                            >
+                                {cancelledRequests.includes(request.buddyRequestId) ? 'Cancelled' : 'Cancel'}
+                            </Button>
+
+                            
+
 
 
 
@@ -211,12 +219,26 @@ const RequestingPost = () => {
                     </Col>
                 ))}
             </Row>
+            <div style={{ display: 'flex', justifyContent: 'center', width: '100%', marginTop: '20px' }}>
+
+                <Pagination
+                    current={currentPage}
+                    total={pendingRequests.length}
+                    pageSize={postsPerPage}
+                    onChange={(page) => setCurrentPage(page)}
+                    style={{
+                        marginTop: '20px',
+                    }}
+                />
+            </div>
+
             {
                 currentDetails && (
                     <ViewRequestingDetailsModal
                         visible={!!currentDetails}
                         onClose={handleCloseModal}
                         travel={currentDetails}
+                        status={requestStatus}
                     />
                 )
             }

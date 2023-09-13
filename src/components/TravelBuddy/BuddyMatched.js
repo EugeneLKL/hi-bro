@@ -4,14 +4,13 @@ import axios from 'axios';
 import { useAuth } from '../../AuthContext';
 
 const BuddyMatched = () => {
-    const { userId } = useAuth();
+    const { userId, userName } = useAuth();
     const [matchedBuddies, setMatchedBuddies] = useState([]);
 
     useEffect(() => {
         const fetchBuddyMatched = async () => {
             try {
                 const response = await axios.get('/api/getBuddyFoundPosts');
-                // Filter the result based on creator ID or buddy ID
                 const filteredBuddies = response.data.filter(buddy =>
                     buddy.creator.userId === userId || buddy.buddyId === userId
                 );
@@ -42,6 +41,14 @@ const BuddyMatched = () => {
         }
     };
 
+    const redirectToWhatsApp = (phoneNumber) => {
+        console.log(userName);
+        const text = `Hi, I'm reaching out regarding our matched trip on the Hi-Bro (Travel Buddy) platform. Nice to meet you! I'm ${userName}!`;
+        const encodedText = encodeURIComponent(text);
+        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedText}`;
+        window.open(whatsappUrl, '_blank');
+    }
+    
 
     return (
         <div>
@@ -54,13 +61,17 @@ const BuddyMatched = () => {
                             <p>Email: {buddy.creator.userEmail}</p>
                             {/* Other buddy information */}
 
+                            <Button 
+                                style={{ marginRight: '10px' }} 
+                                type="primary" 
+                                onClick={() => redirectToWhatsApp(buddy.creator.phoneNum)}>
+                                Contact on WhatsApp
+                            </Button>
 
                             <Button type="primary" onClick={() => handleUnpair(buddy.id)}>
                                 Unpair Buddy
                             </Button>
-
                         </Card>
-
                     </Col>
                 ))}
             </Row>

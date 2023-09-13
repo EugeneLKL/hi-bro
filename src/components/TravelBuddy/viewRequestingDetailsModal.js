@@ -1,13 +1,29 @@
 import { Modal, Image, Col, Row, Divider, Space, Tag } from 'antd';
 import { TbGenderMale, TbGenderFemale } from 'react-icons/tb';
-
 import { AiFillCheckCircle, AiFillCloseCircle, AiOutlineClockCircle } from 'react-icons/ai';
 import { MdOutlineTravelExplore } from 'react-icons/md';
 import { CiCalendarDate, CiSquareInfo, CiUser, CiLocationArrow1 } from 'react-icons/ci';
 import { HiMagnifyingGlass } from 'react-icons/hi2'
 import { PiGenderFemaleThin, PiGenderMaleThin, PiCakeThin } from 'react-icons/pi'
+import { SlInfo } from 'react-icons/sl'
+import { GrStatusCriticalSmall } from 'react-icons/gr'
 
-const ViewRequestingDetailsModal = ({ visible, onClose, travel }) => {
+
+const ViewRequestingDetailsModal = ({ visible, onClose, travel, status }) => {
+
+    console.log(travel);
+    console.log(status);
+
+    const getStatusIcon = (requestStatus) => {
+        switch (requestStatus) {
+            case 'Accepted':
+                return <GrStatusCriticalSmall style={{ color: '#90EE90', marginRight: '12px' }} />;
+            case 'Rejected':
+                return <GrStatusCriticalSmall style={{ color: 'red', marginRight: '12px' }} />;
+            default:
+                return <GrStatusCriticalSmall style={{ color: 'orange', marginRight: '12px' }} />;
+        }
+    };
 
     const formatDate = (dateStr) => {
         const [year, month, day] = dateStr.split('-');
@@ -80,10 +96,16 @@ const ViewRequestingDetailsModal = ({ visible, onClose, travel }) => {
                     </div>
                 </Col>
 
-                <Col span={10}>
+                <Col
+                    span={10}
+                >
                     {/* Right column for Travel Details (uncomment when needed) */}
-                    <Row gutter={24}>
-                        <Col span={24}>
+                    <Row
+                        gutter={24}
+                    >
+                        <Col
+                            span={24}
+                        >
                             <span
                                 style={{
                                     display: 'flex',
@@ -98,10 +120,12 @@ const ViewRequestingDetailsModal = ({ visible, onClose, travel }) => {
                         </Col>
                     </Row>
 
-                    <Row gutter={24}
+                    <Row
+                        gutter={24}
                         style={{
                             marginTop: '8px',
-                        }}>
+                        }}
+                    >
                         <Col
                             span={24}>
                             <span
@@ -127,10 +151,12 @@ const ViewRequestingDetailsModal = ({ visible, onClose, travel }) => {
                         </Col>
                     </Row>
 
-                    <Row gutter={24}
+                    <Row
+                        gutter={24}
                         style={{
                             marginTop: '8px',
-                        }}>
+                        }}
+                    >
                         <Col span={24}>
                             <span
                                 style={{
@@ -154,7 +180,8 @@ const ViewRequestingDetailsModal = ({ visible, onClose, travel }) => {
             </Row>
 
             <h4>Travel Information</h4>
-            <Row gutter={18}
+            <Row
+                gutter={18}
                 style={{
                     alignItems: 'center',
                     marginTop: '10px',
@@ -162,11 +189,42 @@ const ViewRequestingDetailsModal = ({ visible, onClose, travel }) => {
                     borderRadius: '5px',
                     padding: '20px 0',
                     border: '1px solid rgba(0, 0, 0, 0.1)'
-                }}>
+                }}
+            >
 
-                <Col span={24}>
+                <Col
+                    span={24}
+                >
                     <Row
-                        gutter={24}>
+                        gutter={24}
+                    >
+                        <Col span={24}>
+                            <span
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    fontSize: '0.85rem',
+                                    color: 'rgba(0, 0, 0, 0.35)',
+                                    marginLeft: '20px',
+
+                                }}>
+                                {getStatusIcon(status)}
+                                {status === 'Accepted'
+                                    ? 'Congratulations! The post owner has accepted you as their buddy!'
+                                    : (status === 'Rejected'
+                                        ? 'Sorry... It seems you did not meet the post owner requirements.'
+                                        : 'Please be patient. Your request is still pending.')
+                                }
+                            </span>
+                        </Col>
+                    </Row>
+
+                    <Row
+                        gutter={24}
+                        style={{
+                            marginTop: '8px',
+                        }}
+                    >
                         <Col span={24}>
                             <span
                                 style={{
@@ -183,7 +241,12 @@ const ViewRequestingDetailsModal = ({ visible, onClose, travel }) => {
                         </Col>
                     </Row>
 
-                    <Row gutter={24}>
+                    <Row
+                        gutter={24}
+                        style={{
+                            marginTop: '8px',
+                        }}
+                    >
                         <Col span={24}>
                             <span
                                 style={{
@@ -209,74 +272,58 @@ const ViewRequestingDetailsModal = ({ visible, onClose, travel }) => {
                                         color: 'rgb(0,0,0,0)',
                                         marginRight: '12px'
                                     }} />
-                                {calculateDuration(travel.startDate, travel.endDate)} day(s)
+                                ({calculateDuration(travel.startDate, travel.endDate)} day(s))
 
                             </span>
-
                         </Col>
                     </Row>
 
-                    <Row gutter={24}>
-                        <Col span={24}>
-                            <span
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    marginLeft: '20px',
-                                }}>
-                                <CiCalendarDate
+                    {travel.buddyPreference && travel.buddyPreference.length > 0 &&
+                        <Row
+                            gutter={24}
+                            style={{
+                                marginTop: '8px',
+                                marginLeft: '25px',
+                            }}
+                        >
+                            <Col span={24}>
+                                <Space size={[0, 8]} wrap>
+                                    {travel.buddyPreference.map((preference, index) => (
+                                        <Tag key={index} color="cyan">{preference}</Tag>
+                                    ))}
+                                </Space>
+                            </Col>
+                        </Row>
+                    }
+
+
+
+                    {travel.additionalInfo &&
+                        <Row
+                            gutter={24}
+                            style={{
+                                marginTop: '8px',
+                            }}
+                        >
+                            <Col span={24}>
+                                <span
                                     style={{
-                                        marginRight: '12px'
-                                    }} />
-                                {` ${new Date(travel.startDate).toLocaleDateString()} - ${new Date(travel.endDate).toLocaleDateString()}`}
-
-                            </span>
-                            <span
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    marginLeft: '20px',
-                                }}>
-                                <CiCalendarDate
-                                    style={{
-                                        color: 'rgb(0,0,0,0)',
-                                        marginRight: '12px'
-                                    }} />
-                                {calculateDuration(travel.startDate, travel.endDate)} day(s)
-
-                            </span>
-
-                        </Col>
-                    </Row>
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        marginLeft: '20px',
+                                    }}>
+                                    <SlInfo
+                                        style={{
+                                            marginRight: '12px'
+                                        }} />
+                                    <p>{travel.additionalInfo}</p>
+                                </span>
+                            </Col>
+                        </Row>
+                    }
                 </Col>
-                <Divider orientation="left">Preferences</Divider>
-<Space size={[0, 8]} wrap>
-    {travel.buddyPreference.map((preference, index) => (
-        <Tag key={index} color="cyan">{preference}</Tag>
-        ))}
-</Space>
-
-{travel.additionalInfo && (
-    <>
-        <Divider orientation="left">Additional Information</Divider>
-        <p>{travel.additionalInfo}</p>
-    </>
-)}
-
-
-
-
-
-            </Row>
-
-
-
-
-
-
-            <p>Start Date: {new Date(travel.startDate).toLocaleDateString()}</p>
-            <p>End Date: {new Date(travel.endDate).toLocaleDateString()}</p>
-        </Modal>
+            </Row >
+        </Modal >
     );
 }
 

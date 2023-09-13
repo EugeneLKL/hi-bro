@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Col, Row, Image, Button } from 'antd';
+import { Card, Col, Row, Image, Button, Pagination } from 'antd';
 import { useAuth } from '../../AuthContext';
 import { BiSolidUser, BiDetail } from 'react-icons/bi'
 import { SlCalender, SlLocationPin, SlInfo } from 'react-icons/sl'
@@ -14,8 +14,16 @@ const TravelBuddyCardPost = () => {
     const [loadingStates, setLoadingStates] = useState({}); // Track loading state for each post
     const [requestButtonStates, setRequestButtonStates] = useState({}); // Track button text for each post
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;  // or whatever number you want
 
+    const indexOfLastPost = currentPage * itemsPerPage;
+    const indexOfFirstPost = indexOfLastPost - itemsPerPage;
+    const currentPosts = posts.slice(indexOfFirstPost, indexOfLastPost);
 
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+    };
 
     const { Meta } = Card;
 
@@ -144,7 +152,7 @@ const TravelBuddyCardPost = () => {
                     display: 'flex',
                 }}
             >
-                {posts.map(post => (
+                {currentPosts.map(post => (
                     <Col
                         key={post.id}
                         span={12}
@@ -284,6 +292,16 @@ const TravelBuddyCardPost = () => {
                     </Col>
                 ))}
             </Row>
+            {/* Pagination component */}
+            {posts.length > itemsPerPage && (
+                <Pagination 
+                    current={currentPage}
+                    total={posts.length}
+                    pageSize={itemsPerPage}
+                    onChange={handlePageChange}
+                    style={{ textAlign: 'center', marginTop: '20px' }}
+                />
+            )}
         </div>
     );
 };

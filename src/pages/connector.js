@@ -10,7 +10,7 @@ const quotes = {
 const Connector = () => {
   const [hovered, setHovered] = useState("");
   const transitionDuration = "0.5s";
-  const { userId } = useAuth();
+  const { userId, userName } = useAuth();
 
   const handleHover = (element) => {
     setHovered(element);
