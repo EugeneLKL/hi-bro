@@ -28,9 +28,10 @@ const Login = () => {
         message.success('Login Successfully!');
 
         const userId = checkUserRegister.data.userId;
+        const userName = checkUserRegister.data.userName;
 
         // Use handleLogin function to update authentication status and user ID
-        handleLogin(userId);
+        handleLogin(userId, userName);
         
         // Redirect to the profile page
         navigate(`/connector`);

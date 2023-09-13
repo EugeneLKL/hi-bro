@@ -1,18 +1,55 @@
 import React, { useEffect, useState } from 'react';
-import { EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/icons';
-import { BiSolidUser, BiDetail } from 'react-icons/bi'
-import { SlCalender, SlLocationPin, SlInfo, } from 'react-icons/sl'
-import { TbGenderMale, TbGenderFemale } from 'react-icons/tb'
-import { Card, Col, Row, Button, Avatar, Image } from 'antd'; // Import Button from antd
+import { BiSolidUser, BiDetail } from 'react-icons/bi';
+import { SlCalender, SlLocationPin, SlInfo } from 'react-icons/sl';
+import { TbGenderMale, TbGenderFemale } from 'react-icons/tb';
+import { Card, Col, Row, Button, Avatar, Image, Tabs } from 'antd';
 import axios from 'axios';
 import { useAuth } from '../../AuthContext';
 
 const { Meta } = Card;
+const { TabPane } = Tabs;
+
+const cardStyle = {
+    width: 350,
+    marginBottom: '16px',
+    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.08)',  // Add shadow
+    borderRadius: '8px',  // Rounded corners
+};
+
+const dateStyle = {
+    backgroundColor: '#f7f8fc',  // Light background
+    padding: '5px 10px',  // Padding around the date
+    borderRadius: '15px',  // Rounded corners for date
+    fontWeight: '600',  // Bold the font
+    display: 'inline-block',  // For the padding to take effect
+    marginRight: '10px'
+};
+
+const iconStyle = {
+    fontSize: '20px',  // Increase icon size slightly
+    color: '#555',  // Uniform color for icons
+};
+
+
+const avatarIconStyle = {
+    marginRight: '20px',
+};
+
+const genderIconStyle = {
+    marginLeft: '8px',
+};
+
+const buttonStyle = {
+    borderRadius: '4px',
+    margin: '5px',
+};
 
 const BuddyRequester = () => {
     const { userId } = useAuth();
     const [requestedPosts, setRequestedPosts] = useState([]);
     const [imageUrl, setImageUrl] = useState('');
+    const [acceptedPosts, setAcceptedPosts] = useState([]);
+    const [rejectedPosts, setRejectedPosts] = useState([]);
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -56,8 +93,8 @@ const BuddyRequester = () => {
                 postId: postId
             });
             console.log(result);
-            // After accepting the request, you can update the state or fetch data again if needed
-            // fetchRequestedPosts();
+
+            setAcceptedPosts(prev => [...prev, postId]);
         } catch (error) {
             console.log(error);
         }
@@ -70,15 +107,16 @@ const BuddyRequester = () => {
                 postId: postId,
             });
             console.log(result);
-            // After rejecting the request, you can update the state or fetch data again if needed
-            fetchRequestedPosts();
+
+            setRejectedPosts(prev => [...prev, postId]);
         } catch (error) {
             console.log(error);
         }
     };
 
+
     const groupedPostsByDestination = {};
-    
+
     requestedPosts.forEach(requestedPost => {
         const destination = requestedPost.post.destination;
         if (!groupedPostsByDestination[destination]) {
@@ -110,117 +148,121 @@ const BuddyRequester = () => {
         });
     });
 
+    const renderCard = (requestedPost) => (
+        <Col key={requestedPost.post.travelPostId} span={8} style={{ marginLeft: '50px' }}>
+            <Card
+                style={cardStyle}
+                cover={
+                    <Image
+                        src={requestedPost.requester.profileImage}
+                        alt="Profile"
+                        width={350}
+                        height={200}
+                        style={{ objectFit: 'cover', overflow: 'hidden' }}
+                    />
+                }
+            >
+                <Meta
+                    title={
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                            <BiSolidUser style={avatarIconStyle} />
+                            {requestedPost.requester.userName}
+                            {requestedPost.requester.gender === 'Male' ? <TbGenderMale style={genderIconStyle} /> : <TbGenderFemale style={genderIconStyle} />}
+                        </span>
+                    }
+                    description={
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                            <SlCalender style={{ ...iconStyle, marginRight: '10px' }} />
+                            <span style={dateStyle}>
+                                {formatDate(requestedPost.post.startDate)} - {formatDate(requestedPost.post.endDate)}
+                            </span>
+                            ({calculateTripDuration(requestedPost.post.startDate, requestedPost.post.endDate)} Days)
+                        </span>
+                    }
+                />
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
+
+                    {acceptedPosts.includes(requestedPost.post.travelPostId) ? (
+                        <Button disabled style={{ ...buttonStyle, flex: 1, lineHeight: 'normal' }}>
+                            Accepted
+                        </Button>
+                    ) : (
+                        <Button
+                            style={{ ...buttonStyle, flex: 1, marginRight: '5px', lineHeight: 'normal' }}
+                            onClick={() => handleAccept(requestedPost.post.travelPostId, requestedPost.requester.userId)}
+                            disabled={rejectedPosts.includes(requestedPost.post.travelPostId)}  // Disable if post is rejected
+                        >
+                            Accept
+                        </Button>
+                    )}
+
+                    {rejectedPosts.includes(requestedPost.post.travelPostId) ? (
+                        <Button disabled style={{ ...buttonStyle, flex: 1, lineHeight: 'normal' }}>
+                            Rejected
+                        </Button>
+                    ) : (
+                        <Button
+                            style={{ ...buttonStyle, flex: 1, marginLeft: '5px', lineHeight: 'normal' }}
+                            onClick={() => handleReject(requestedPost.post.travelPostId, requestedPost.requester.userId)}
+                            disabled={acceptedPosts.includes(requestedPost.post.travelPostId)}  // Disable if post is accepted
+                        >
+                            Reject
+                        </Button>
+                    )}
+                </div>
+            </Card>
+        </Col>
+    );
+
+
+    const sortByDate = (a, b) => {
+        const [dayA, monthA, yearA] = a.split('-').map(num => parseInt(num, 10));
+        const [dayB, monthB, yearB] = b.split('-').map(num => parseInt(num, 10));
+
+        if (yearA !== yearB) return yearB - yearA;
+        if (monthA !== monthB) return monthB - monthA;
+        return dayB - dayA;
+    };
+
+
+
     return (
         <div>
-
-            <h2>See who wanna be your buddy:</h2>
-            {Object.keys(groupedPostsByDestinationAndDate).map(destination => (
-                <div key={destination}>
-                    <h3>{destination}</h3>
-                    {Object.keys(groupedPostsByDestinationAndDate[destination]).map(date => (
-                        <div key={date}>
-                            <h4>{date}</h4>
-                            <Row
-                                gutter={[24, 24]}
-                                style={{
-                                    display: 'flex',
-                                }}
-                            >
-                                {groupedPostsByDestinationAndDate[destination][date].map(requestedPost => (
-                                    <Col
-                                        key={requestedPost.post.travelPostId}
-                                        span={8}
+            <Tabs tabPosition="left">
+                {Object.keys(groupedPostsByDestinationAndDate).map(destination => (
+                    <TabPane tab={destination} key={destination}>
+                        {Object.keys(groupedPostsByDestinationAndDate[destination])
+                            .sort(sortByDate)  // Use the custom sorting function
+                            .map(date => (
+                                <div key={date}>
+                                    <h4
+                                        style={{
+                                            // marginLeft: '50px',
+                                            marginBottom: '30px',
+                                            marginTop: '10px',
+                                            backgroundColor: '#f7f8fc', // light grayish background
+                                            padding: '5px 15px', // padding around date
+                                            borderRadius: '10px', // rounded corners
+                                            // boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.08)', // subtle drop shadow
+                                            // display: 'inline-block', // to fit the content
+                                            fontWeight: '600' // bolder font
+                                        }}
                                     >
-                                        <Card
-                                            style={{
-                                                width: 350,
-                                            }}
-                                            cover={
-                                                <Image
-                                                    src={requestedPost.requester.profileImage}
-                                                    alt="example"
-                                                    width={350}
-                                                    height={200}
-                                                    // Hide overflow
-                                                    style={{
-                                                        objectFit: 'cover',
-                                                        overflow: 'hidden',
-                                                    }}
+                                        {date}
+                                    </h4>
+                                    <Row gutter={[24, 24]} style={{ display: 'flex' }}>
+                                        {groupedPostsByDestinationAndDate[destination][date].map(requestedPost => renderCard(requestedPost))}
+                                    </Row>
+                                </div>
 
-                                                />
-                                            }
-                                            actions={[
-                                                <SlCalender onClick={() => handleAccept(requestedPost.post.travelPostId, requestedPost.requester.userId)} />,
-                                                <Button onClick={() => handleReject(requestedPost.post.travelPostId)}>Reject</Button>,
-                                            ]}
-                                        >
-                                            <Meta
-                                                // avatar={<Avatar src="https://xsgames.co/randomusers/avatar.php?g=pixel" />}
-                                                title={
-                                                    <span
-                                                        style={{
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                        }}>
-
-                                                        <BiSolidUser
-                                                            style={{
-                                                                marginRight: '8px'
-                                                            }} />
-                                                        {requestedPost.requester.userName}
-
-                                                        {requestedPost.requester.gender === 'Male' ? (
-                                                            <TbGenderMale
-                                                                style={{
-                                                                    marginLeft: '8px'
-                                                                }}
-                                                            />
-                                                        ) : (
-                                                            <TbGenderFemale
-                                                                style={{
-                                                                    marginLeft: '8px'
-                                                                }}
-                                                            />
-                                                        )}
-                                                    </span>
-                                                }
-                                                description={
-                                                    <span
-                                                        style={{
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                        }}>
-                                                        <SlCalender style={{
-                                                            marginRight: '10px',
-                                                        }} />
-                                                        {formatDate(requestedPost.post.startDate)} - {formatDate(requestedPost.post.endDate)}
-                                                        {/* Make a space */}
-                                                        {'  '}
-                                                        ({calculateTripDuration(requestedPost.post.startDate, requestedPost.post.endDate)} Days)
-                                                    </span>
-                                                }
-                                            />
-                                        </Card>
-                                        <p>Post ID: {requestedPost.post.travelPostId}</p>
-                                        <p>Requester: {requestedPost.requester.userName}</p>
-                                        <p>Destination: {requestedPost.post.destination}</p>
-                                        <p>Buddy Found: {requestedPost.post.buddyFound ? 'Yes' : 'No'}</p>
-                                        {/* Add buttons for accept and reject */}
-                                        {!requestedPost.post.buddyFound && (
-                                            <div>
-                                                <Button onClick={() => handleAccept(requestedPost.post.travelPostId, requestedPost.requester.userId)}>Accept</Button>
-                                                <Button onClick={() => handleReject(requestedPost.post.travelPostId, requestedPost.requester.userId)}>Reject</Button>
-                                            </div>
-                                        )}
-                                    </Col>
-                                ))}
-                            </Row>
-                        </div>
-                    ))}
-                </div>
-            ))}
+                            ))}
+                    </TabPane>
+                ))}
+            </Tabs>
         </div>
     );
+
+
 }
 
 export default BuddyRequester;

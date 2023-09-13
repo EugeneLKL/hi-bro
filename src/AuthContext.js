@@ -12,11 +12,13 @@ export const AuthProvider = ({ children }) => {
   const [userName, setUserName] = useState(localStorage.getItem('userName') || '');
   const [rerender, setRerender] = useState(true);
 
-  const handleLogin = (id) => {
+  const handleLogin = (id, name) => {
     setIsLoggedIn(true);
     setUserId(id);
+    setUserName(name);
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('userId', id);
+    localStorage.setItem('userName', name);
   };
 
   const handleLogout = () => {
@@ -24,6 +26,7 @@ export const AuthProvider = ({ children }) => {
     // setUserId(null);
     localStorage.setItem('isLoggedIn', 'false');
     localStorage.removeItem('userId');
+    localStorage.removeItem('userName');
   };
 
   return (

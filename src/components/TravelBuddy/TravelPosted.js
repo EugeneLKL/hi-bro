@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, Col, Row, Image, Button, Modal } from 'antd';
+import { Card, Col, Row, Image, Button, Modal, Pagination, Tooltip } from 'antd';
 import { useAuth } from '../../AuthContext';
 import { BiSolidUser, BiDetail } from 'react-icons/bi'
 import { SlCalender, SlLocationPin, SlInfo } from 'react-icons/sl'
@@ -12,13 +12,25 @@ import EditPostModal from './TravelPostEditModal';
 const TravelPosted = () => {
 
     const history = useNavigate();
-    const { userId, rerender, setRerender } = useAuth();
+    const { userId, rerender, setRerender, userName } = useAuth();
     const [posts, setPosts] = useState([]);
     const [postRequester, setPostRequester] = useState([]);
     const [imageUrl, setImageUrl] = useState('');
     const [loadingStates, setLoadingStates] = useState({});
     const [isEditPostModalVisible, setIsEditPostModalVisible] = useState(false);
     const [editPostData, setEditPostData] = useState(null);
+    const [buddyInfo, setBuddyInfo] = useState(null);
+    const [buddyNames, setBuddyNames] = useState({});
+
+
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const [postsPerPage] = useState(6);
+
+
+    const indexOfLastPost = currentPage * postsPerPage;
+    const indexOfFirstPost = indexOfLastPost - postsPerPage;
+    const currentPosts = posts.slice(indexOfFirstPost, indexOfLastPost);
 
     const showEditPostModal = () => {
         setIsEditPostModalVisible(true);
@@ -60,7 +72,7 @@ const TravelPosted = () => {
 
     const handleDeleteClick = (post) => {
         console.log('Delete ID', post.travelPostId);
-    
+
         // Check if there are requesters
         if (post.requesterCount > 0) {
             Modal.confirm({
@@ -86,7 +98,7 @@ const TravelPosted = () => {
             });
         }
     };
-    
+
 
     const deletePost = async (id) => {
         try {
@@ -118,34 +130,74 @@ const TravelPosted = () => {
     const countRequesters = (postId, allRequests) => {
         return allRequests.filter(request => request.post.travelPostId === postId).length;
     };
-    
+
+    const handleContactBuddy = async (buddyId) => {
+        try {
+            // Assuming your API endpoint and the way you access the buddy's ID looks like this
+            const response = await axios.get(`/api/getUserInfo/${buddyId}`);
+            const buddyData = response.data;
+            console.log(buddyData.phoneNum);
+            const text = `Hi, I'm reaching out regarding our matched trip on the Hi-Bro (Travel Buddy) platform. Nice to meet you! I'm ${userName}!`;
+        const encodedText = encodeURIComponent(text);
+        const whatsappUrl = `https://wa.me/${buddyData.phoneNum}?text=${encodedText}`;
+        window.open(whatsappUrl, '_blank');
+            // Now, you can do whatever you want with the buddyData, 
+            // e.g., open a modal to display the contact info or redirect to another page.
+
+        } catch (error) {
+            console.error("Failed to fetch buddy data:", error);
+        }
+    };
+
+
+
     useEffect(() => {
         const getPostsAndRequests = async () => {
             try {
                 const postResult = await axios.get('/api/getTravelBuddyPost');
                 const requestResult = await axios.get('/api/getAllBuddyRequests');
-    
+
                 // Filter out the posts that belong to the logged-in user
                 const userPosts = postResult.data.filter(post => post.creator.userId === userId);
-    
+
                 // For each user post, add requesterCount
                 userPosts.forEach(post => {
                     post.requesterCount = countRequesters(post.travelPostId, requestResult.data);
                 });
-    
+
+                // Fetch buddy names if buddyFound is true
+                const fetchedBuddyNames = {};
+                for (let post of userPosts) {
+                    if (post.buddyFound) {
+                        fetchedBuddyNames[post.travelPostId] = await getBuddyInfo(post.buddyId);
+                    }
+                }
+
                 // Set the posts with requester count to the state
                 if (userPosts.length) {
                     setPosts(userPosts);
+                    setBuddyNames(fetchedBuddyNames);  // Set the fetched buddy names
                 }
-    
+
             } catch (error) {
                 console.error("Failed to fetch posts and requests:", error);
             }
         };
-    
+
         getPostsAndRequests();
     }, [userId, rerender]);
-    
+
+
+
+    const getBuddyInfo = async (buddyId) => {
+        try {
+            const response = await axios.get(`/api/getUserInfo/${buddyId}`);
+            return response.data.userName;
+        } catch (error) {
+            console.error("Failed to fetch buddy data:", error);
+        }
+    };
+
 
 
     const { Meta } = Card;
@@ -172,7 +224,7 @@ const TravelPosted = () => {
                     display: 'flex',
                 }}
             >
-                {posts.map(post => (
+                {currentPosts.map(post => (
                     <Col
                         key={post.id}
                         span={12}
@@ -217,18 +269,19 @@ const TravelPosted = () => {
                                 {'  '}
                                 ({calculateTripDuration(post.startDate, post.endDate)} Days)
                             </p>
-                            <p
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    marginTop: '8px',
-                                }}>
+                            <p style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                marginTop: '8px',
+                            }}>
                                 <BiSolidUser style={{
                                     marginRight: '10px',
                                     marginLeft: '8px',
                                 }} />
-                                {post.requesterCount} Requester(s)
+
+                                {post.buddyFound ? buddyNames[post.travelPostId] : `${post.requesterCount} Requester(s)`}
                             </p>
+
 
 
 
@@ -258,14 +311,32 @@ const TravelPosted = () => {
                                 ))}
                             </ul>
                             <div style={actionButtonsStyles}>
-                                <Button onClick={() => handleEditClick(post)}>Edit</Button>
-                                <Button type="danger" onClick={() => handleDeleteClick(post)}>Delete</Button>
+                                {post.buddyFound ? (
+                                    <Tooltip title="Try contacting your buddy if there is any changes.">
+                                        <Button onClick={() => handleContactBuddy(post.buddyId)}>Contact</Button>
 
+                                    </Tooltip>
+                                ) : (
+                                    <>
+                                        <Button onClick={() => handleEditClick(post)}>Edit</Button>
+                                        <Button danger onClick={() => handleDeleteClick(post)}>Delete</Button>
+                                    </>
+                                )}
                             </div>
+
+
                         </Card>
                     </Col>
                 ))}
             </Row>
+            <div style={{ display: 'flex', justifyContent: 'center', width: '100%', marginTop: '20px' }}>
+                <Pagination
+                    current={currentPage}
+                    total={posts.length}
+                    pageSize={postsPerPage}
+                    onChange={(page) => setCurrentPage(page)}
+                />
+            </div>
 
             {
                 isEditPostModalVisible &&

@@ -31,6 +31,7 @@ import "./App.css";
 import "./Account.css";
 import "./Profile.css";
 import "./TravelBuddy.css";
+import BuddyMatched from "./components/TravelBuddy/BuddyMatched";
 
 const queryClient = new QueryClient();
 
