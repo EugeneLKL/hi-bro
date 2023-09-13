@@ -477,7 +477,8 @@ const TrailPage = () => {
   const { userId } = useAuth();
   const [reviews, setReviews] = useState(undefined);
   const [isCreator, setIsCreator] = useState(false);
-  const [trailUserId, setTrailUserId] = useState(false);
+  const [trailUserId, setTrailUserId] = useState(false)
+  const [favoriteTrails, setFavoriteTrails] = useState([]);
 
   const queryClient = useQueryClient();
 
@@ -507,7 +508,7 @@ const TrailPage = () => {
     },
     {
       onSuccess: (data) => {
-        console.log(data);
+        console.log(data)
         // Calculate average rating
         const ratings = data.trailRating;
         console.log(ratings);
@@ -535,6 +536,9 @@ const TrailPage = () => {
         setSelectedAmenities(data.amenities);
         setEstimatedDuration(data.estimatedDuration);
         setTrailUserId(data.userId);
+        console.log(data.SavedTrails)
+        setFavoriteTrails(data.SavedTrails);
+        
       },
     }
   );
@@ -851,18 +855,23 @@ const TrailPage = () => {
     setIsDelete(false);
   };
 
-  const handleSave = () => {
-    axios
-      .post(`/api/trails/${trailId}/favorites`, {
-        userId,
-      })
-      .then((response) => {
-        console.log(response);
-        toast.success("Trail saved successfully!");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+  const handleSave = () => {  
+    //if not in favorite trails, add to favorite trails
+    //if exist in favorite trails, toast already exist
+    if (favoriteTrails.some(trail => trail.trailId === trailId)) {
+      toast.error("Trail already saved!");
+    } else {
+      axios
+        .post(`/api/trails/${trailId}/favorites`, {userId})
+        .then((response) => {
+          console.log(response);
+          toast.success("Trail saved successfully!");
+          setFavoriteTrails(response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   };
 
   return (
