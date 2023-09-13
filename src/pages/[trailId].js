@@ -856,8 +856,6 @@ const TrailPage = () => {
   };
 
   const handleSave = () => {  
-    //if not in favorite trails, add to favorite trails
-    //if exist in favorite trails, toast already exist
     if (favoriteTrails.some(trail => trail.trailId === trailId)) {
       toast.error("Trail already saved!");
     } else {
