@@ -43,6 +43,7 @@ const RequestingPost = () => {
 
     const handleCancelRequest = (requestId) => {
         // Confirmation before canceling the request
+        console.log('ID:', requestId);
         Modal.confirm({
             title: 'Cancel requesting?',
             content: 'Once canceled, you will be required to make a new requestment again.',
@@ -124,13 +125,17 @@ const RequestingPost = () => {
                                                 color: 'rgba(0, 0, 0, 0.35)'
                                             }}>
                                             {getStatusIcon(request.requestStatus)}
-                                            {request.requestStatus === 'Accepted'
-                                                ? 'Accepted'
-                                                : (request.requestStatus === 'Rejected'
-                                                    ? 'Rejected'
-                                                    : 'Pending')
+                                            {cancelledRequests.includes(request.buddyRequestId)
+                                                ? 'Cancelled'
+                                                : (request.requestStatus === 'Accepted'
+                                                    ? 'Accepted'
+                                                    : (request.requestStatus === 'Rejected'
+                                                        ? 'Rejected'
+                                                        : 'Pending')
+                                                )
                                             }
                                         </span>
+
                                     </div>
                                 }
                             />
@@ -182,7 +187,7 @@ const RequestingPost = () => {
 
                             <Button
                                 onClick={() => handleViewUserDetails(request.post, request.requestStatus)}
-                                style={{ position: 'absolute', right: '110px', bottom: '10px' }}
+                                style={{ position: 'absolute', right: '120px', bottom: '10px' }}
                             >
                                 <span
                                     style={{
@@ -209,7 +214,7 @@ const RequestingPost = () => {
                                 {cancelledRequests.includes(request.buddyRequestId) ? 'Cancelled' : 'Cancel'}
                             </Button>
 
-                            
+
 
 
 

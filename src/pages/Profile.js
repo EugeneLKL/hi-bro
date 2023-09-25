@@ -414,7 +414,7 @@ const Profile = () => {
                         >
                             <p>{userInfo?.gender}</p>
                         </Form.Item>
-                        <Button onClick={showEditGenderModal}> <BiEditAlt style={{ marginRight: '8px' }} /> Edit</Button>
+                        {/* <Button onClick={showEditGenderModal}> <BiEditAlt style={{ marginRight: '8px' }} /> Edit</Button> */}
                     </div>
 
                     {/* Edit Gender Modal */}
@@ -432,7 +432,7 @@ const Profile = () => {
                         >
                             <p>{userInfo?.birthDate}</p>
                         </Form.Item>
-                        <Button onClick={showEditBirthdateModal}> <BiEditAlt style={{ marginRight: '8px' }} /> Edit</Button>
+                        {/* <Button onClick={showEditBirthdateModal}> <BiEditAlt style={{ marginRight: '8px' }} /> Edit</Button> */}
                     </div>
 
                     {/* Edit Birthdate Modal */}

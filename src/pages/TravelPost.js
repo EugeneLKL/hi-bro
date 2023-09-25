@@ -30,8 +30,7 @@ const TravelPost = () => {
                     marginBottom: '5%',
                 }}
             >
-                {/* TODO: Change to 1 for dicover more */}
-                <Tabs defaultActiveKey="2">
+                <Tabs defaultActiveKey="1">
                     <TabPane tab={<span style={{ display: 'flex', alignItems: 'center' }}><RiAddBoxFill style={{ marginRight: '8px' }} /> Discover Post</span>} key="1">
                         <TravelBuddyModalForm />
 

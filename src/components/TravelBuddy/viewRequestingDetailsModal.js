@@ -168,7 +168,10 @@ const ViewRequestingDetailsModal = ({ visible, onClose, travel, status }) => {
                                         marginRight: '10px'
                                     }}
                                 />
-                                {formatDate(travel.creator.birthDate)} (Age: {calculateAge(travel.creator.birthDate)})
+                                {travel && travel.creator && travel.creator.birthDate ? 
+    `${formatDate(travel.creator.birthDate)} (Age: ${calculateAge(travel.creator.birthDate)})` : 
+    'Birthdate not provided'}
+
                             </span>
                         </Col>
                     </Row>

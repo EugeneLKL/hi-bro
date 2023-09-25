@@ -230,7 +230,15 @@ const BuddyRequester = () => {
         <div>
             <Tabs tabPosition="left">
                 {Object.keys(groupedPostsByDestinationAndDate).map(destination => (
-                    <TabPane tab={destination} key={destination}>
+                    <TabPane tab={<span style={{
+                        maxWidth: '150px',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        display: 'inline-block'
+
+                    }} className="tab-title">{destination}</span>} key={destination}
+                    >
                         {Object.keys(groupedPostsByDestinationAndDate[destination])
                             .sort(sortByDate)  // Use the custom sorting function
                             .map(date => (

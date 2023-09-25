@@ -1,21 +1,42 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Col, Row, Button } from 'antd';
+import { Avatar, Card, Col, Row, Button, Tabs, Image, message } from 'antd';
 import axios from 'axios';
 import { useAuth } from '../../AuthContext';
+import { AiOutlineWhatsApp, AiOutlineMail } from 'react-icons/ai'
+import { TbGenderMale, TbGenderFemale } from 'react-icons/tb';
+import { BiSolidUser, BiDetail } from 'react-icons/bi'
+
+const { Meta } = Card;
 
 const BuddyMatched = () => {
     const { userId, userName } = useAuth();
     const [matchedBuddies, setMatchedBuddies] = useState([]);
+    const [searchBuddies, setSerachBuddies] = useState([]);
+
+    const avatarIconStyle = {
+        marginRight: '20px',
+    };
+
+    const genderIconStyle = {
+        marginLeft: '8px',
+    };
 
     useEffect(() => {
         const fetchBuddyMatched = async () => {
             try {
                 const response = await axios.get('/api/getBuddyFoundPosts');
                 const filteredBuddies = response.data.filter(buddy =>
-                    buddy.creator.userId === userId || buddy.buddyId === userId
+                    buddy.creator.userId !== userId && buddy.buddyId === userId
                 );
 
                 setMatchedBuddies(filteredBuddies);
+
+                const filteredPost = response.data.filter(buddy =>
+                    buddy.creator.userId === userId && buddy.buddyFound === true
+                );
+
+                setSerachBuddies(filteredPost);
+
             } catch (error) {
                 console.log(error);
             }
@@ -24,22 +45,78 @@ const BuddyMatched = () => {
         fetchBuddyMatched();
     }, []);
 
-    const handleUnpair = async (buddyId) => {
-        try {
-            const response = await axios.post('/api/unpairBuddy', { buddyId });
+    useEffect(() => {
+        const fetchBuddyMatched = async () => {
+            try {
+                const response = await axios.get('/api/getTravelBuddyRequest');
+                // const filteredBuddies = response.data.filter(buddy =>
+                //     buddy.creator.userId !== userId && buddy.buddyId === userId
+                // );
 
-            if (response.status === 200) {
-                // Remove the unpaired buddy from the local state
-                setMatchedBuddies(prevBuddies =>
-                    prevBuddies.filter(buddy => buddy.id !== buddyId)
+                // setMatchedBuddies(filteredBuddies);
+                console.log('request response', response.data);
+
+                // filter the data by the requesterid is me and the status should be 'accepted'
+                const filteredBuddies = response.data.filter(buddy =>
+                    buddy.requesterId === userId && buddy.requestStatus === 'Accepted'
                 );
-            } else {
-                console.log("Failed to unpair:", response.data.message);
+
+                console.log('filter: ', filteredBuddies);
+
+                // if (!!response?.data[0]) {
+                //     let newArray = [];
+                //     for (let i = 0; i < filteredBuddies.length; i++) {
+                //         const response = await axios.get(`/api/getTravelBuddyPost/${filteredBuddies[i].postId}`);
+                //         newArray.push(response.data);
+                //     }
+                //     setMatchedBuddies(newArray);
+                // }
+
+            } catch (error) {
+                console.log(error);
             }
+        }
+
+        fetchBuddyMatched();
+    }, []);
+
+    console.log('MatchedBuddies: ', matchedBuddies);
+    console.log('SearchBuddies: ', searchBuddies);
+
+    const { TabPane } = Tabs;
+
+    const handleUnpair = async (buddy) => {
+        try {
+            // Unpairing action (you've commented it out in the provided code)
+            await axios.put(`/api/unpair/${buddy.travelPostId}`, {
+                buddyFound: false,
+                buddyId: null,
+            });
+
+            // Delete the record from the buddyRequest
+            await axios.delete(`/api/unpairBuddyRequest`, {
+                data: {
+                    postId: buddy.travelPostId,
+                    requesterId: userId,
+                }
+            });
+            
+            // Show a success message for 2 seconds
+            message.success('Successfully unpaired!', 2);
+    
+            // Use setTimeout to wait for 2 seconds before filtering out the matchedBuddies
+            setTimeout(() => {
+                const newMatchedBuddies = matchedBuddies.filter(matchedBuddy => matchedBuddy.travelPostId !== buddy.travelPostId);
+                setMatchedBuddies(newMatchedBuddies);
+            }, 2000);
+            
         } catch (error) {
             console.log(error);
-        }
+            message.error('Error occurred while unpairing. Please try again.', 2);
+        }  
     };
+    
+
 
     const redirectToWhatsApp = (phoneNumber) => {
         console.log(userName);
@@ -48,35 +125,132 @@ const BuddyMatched = () => {
         const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedText}`;
         window.open(whatsappUrl, '_blank');
     }
-    
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        return `${day}-${month}-${year}`;
+    };
+
+
+    const groupedBuddiesByDestinationAndDate = {};
+
+    matchedBuddies.forEach(buddy => {
+        const destination = buddy.destination;
+        const startDate = formatDate(buddy.startDate);
+
+        if (!groupedBuddiesByDestinationAndDate[destination]) {
+            groupedBuddiesByDestinationAndDate[destination] = {};
+        }
+
+        if (!groupedBuddiesByDestinationAndDate[destination][startDate]) {
+            groupedBuddiesByDestinationAndDate[destination][startDate] = [];
+        }
+
+        groupedBuddiesByDestinationAndDate[destination][startDate].push(buddy);
+    });
+
+    const renderCard = (buddy) => (
+        <Col key={buddy.id} span={8}>
+            <Card title={buddy.name}>
+
+                <Meta
+                    avatar={
+                        <Image src={buddy.creator.profileImage}
+                            alt='Profile'
+                            className='profile-profilePic'
+                            width={70}
+                            height={70}
+                            preview={false}
+                            style={{
+                                // marginLeft: 25
+                            }}
+                        />}
+                    title={
+                        <span style={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}>
+                            <BiSolidUser style={avatarIconStyle} />
+                            {buddy.creator.userName}
+                            {buddy.creator.gender === 'Male' ? <TbGenderMale style={genderIconStyle} /> : <TbGenderFemale style={genderIconStyle} />}
+                        </span>
+                    }
+                    description={
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                            <AiOutlineMail style={{ marginRight: '20px' }} /> {buddy.creator.userEmail}
+                        </span>
+                    }
+                />
+
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
+
+                    <Button
+                        style={{ display: 'flex', alignItems: 'center', }}
+                        onClick={() => redirectToWhatsApp(buddy.creator.phoneNum)}
+                        icon={<AiOutlineWhatsApp style={{ color: '#25D366' }} />}>
+                        Contact
+                    </Button>
+
+                    <Button type="primary" danger onClick={() => handleUnpair(buddy)}>
+                        Unpair Buddy
+                    </Button>
+                </div>
+            </Card>
+        </Col>
+    );
+
+    for (const destination in groupedBuddiesByDestinationAndDate) {
+        const sortedDates = Object.keys(groupedBuddiesByDestinationAndDate[destination]).sort((a, b) => {
+            const dateA = new Date(a.split('-').reverse().join('-'));
+            const dateB = new Date(b.split('-').reverse().join('-'));
+            return dateB - dateA;
+        });
+
+        const sortedBuddiesForDestination = {};
+        sortedDates.forEach(date => {
+            sortedBuddiesForDestination[date] = groupedBuddiesByDestinationAndDate[destination][date];
+        });
+
+        groupedBuddiesByDestinationAndDate[destination] = sortedBuddiesForDestination;
+    }
+
 
     return (
         <div>
-            <h2>Matched Buddies</h2>
-            <Row gutter={[16, 16]}>
-                {matchedBuddies.map(buddy => (
-                    <Col key={buddy.id} xs={24} sm={12} md={8} lg={6}>
-                        <Card title={buddy.name}>
-                            <p>Name: {buddy.creator.userName}</p>
-                            <p>Email: {buddy.creator.userEmail}</p>
-                            {/* Other buddy information */}
+            <Tabs tabPosition="left">
+                {Object.keys(groupedBuddiesByDestinationAndDate).map(destination => (
+                    <TabPane tab={<span style={{
+                        maxWidth: '150px',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        display: 'inline-block'
 
-                            <Button 
-                                style={{ marginRight: '10px' }} 
-                                type="primary" 
-                                onClick={() => redirectToWhatsApp(buddy.creator.phoneNum)}>
-                                Contact on WhatsApp
-                            </Button>
-
-                            <Button type="primary" onClick={() => handleUnpair(buddy.id)}>
-                                Unpair Buddy
-                            </Button>
-                        </Card>
-                    </Col>
+                    }} className="tab-title">{destination}</span>} key={destination}>
+                        {Object.keys(groupedBuddiesByDestinationAndDate[destination]).map(date => (
+                            <div key={date}>
+                                <h4 style={{
+                                    marginBottom: '30px',
+                                    marginTop: '10px',
+                                    backgroundColor: '#f7f8fc',
+                                    padding: '5px 15px',
+                                    borderRadius: '10px',
+                                    fontWeight: '600'
+                                }}>
+                                    {date}
+                                </h4>
+                                <Row gutter={[16, 16]}>
+                                    {groupedBuddiesByDestinationAndDate[destination][date].map(buddy => renderCard(buddy))}
+                                </Row>
+                            </div>
+                        ))}
+                    </TabPane>
                 ))}
-            </Row>
+            </Tabs>
         </div>
     );
+
 }
 
 export default BuddyMatched;

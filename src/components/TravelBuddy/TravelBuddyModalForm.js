@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Button, DatePicker, Modal, Form, Cascader, Checkbox, Col, Row, Input } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Button, DatePicker, Modal, Form, Cascader, Checkbox, Col, Row, Input, AutoComplete } from 'antd';
 import { CiCalendarDate, CiLocationOn } from "react-icons/ci";
 import { PiPuzzlePieceLight } from 'react-icons/pi';
 import { IoIosInformationCircleOutline } from 'react-icons/io';
@@ -78,6 +78,26 @@ const TravelBuddyModalForm = () => {
             return Promise.resolve();
         }
     };
+
+    const flattenDestinations = (arr) => {
+        let result = [];
+        for (const item of arr) {
+            if (item.children) {
+                const childItems = flattenDestinations(item.children).map(child => ({
+                    value: `${item.label} - ${child.label}`,
+                    label: `${item.label} - ${child.label}`
+                }));
+                result.push(...childItems);
+            } else {
+                result.push({
+                    value: item.label,
+                    label: item.label
+                });
+            }
+        }
+        return result;
+    };
+
 
     const destinations = [
         {
@@ -352,6 +372,30 @@ const TravelBuddyModalForm = () => {
         }
     ];
 
+    const flatDestinations = flattenDestinations(destinations);
+
+    // Useefftc for getting trails name from hiking database
+    const [trails, setTrails] = useState([]);
+    useEffect(() => {
+        const fetchTrails = async () => {
+            try {
+                const response = await axios.get('/api/trails');
+                setTrails(response.data);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        fetchTrails();
+    }, []);
+
+    const trailOptions = trails.map(trail => ({
+        value: trail.trailName,
+        label: trail.trailName
+    }));
+
+    const combinedOptions = [...flattenDestinations(destinations), ...trailOptions];
+
+
 
     // onFinish
     const onFinish = async (values) => {
@@ -359,20 +403,12 @@ const TravelBuddyModalForm = () => {
         // Console log each values
         console.log(values.date[0].format('YYYY-MM-DD'));
         console.log(values.date[1].format('YYYY-MM-DD'));
-        console.log(values.destination[0]);
-        console.log(values.destination[1]);
+        console.log(values.destination);
         console.log(values.buddyPreference);
         console.log(values.additonalInfo);
 
-        // if destination[1] is undefined
-        let destination = values.destination[0];
-
-        if (values.destination[1] !== undefined) {
-            destination = values.destination[1] + ", " + values.destination[0];
-        }
-
-
-
+        // Get the destination
+        let destination = values.destination;
 
         const startDate = values.date[0].format('YYYY-MM-DD');
         const endDate = values.date[1].format('YYYY-MM-DD');
@@ -406,7 +442,6 @@ const TravelBuddyModalForm = () => {
         // Check the type of startdate in the newPost
         console.log(typeof newPost.startDate);
 
-        // TODO: Confirmation
         modal.confirm({
             title: 'Confirm posting?',
             content: 'Are you sure you want to post it?',
@@ -508,7 +543,12 @@ const TravelBuddyModalForm = () => {
                             },
                         ]}
                     >
-                        <Cascader options={destinations} changeOnSelect />
+                        <AutoComplete
+                            options={combinedOptions.map(option => ({ value: option.label }))}
+                            filterOption={(inputValue, option) =>
+                                option.value.toUpperCase().includes(inputValue.toUpperCase())
+                            }
+                        />
                     </Form.Item>
 
                     <Form.Item

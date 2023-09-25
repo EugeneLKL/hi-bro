@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, DatePicker, Modal, Form, Checkbox, Col, Row, Input, Tooltip } from 'antd';
+import { Button, DatePicker, Modal, Form, Checkbox, Col, Row, Input, Tooltip, notification } from 'antd';
 import { PiPuzzlePieceLight } from 'react-icons/pi';
 import { CiCalendarDate, CiLocationOn } from "react-icons/ci";
 import { IoIosInformationCircleOutline } from 'react-icons/io';
@@ -18,6 +18,64 @@ const TravelPostEditModal = (props) => {
     const [loading, setLoading] = useState(false);
     const [travelPost, setTravelPost] = useState({});
 
+    const onFinish = async (values) => {
+        setLoading(true);
+
+        try {
+            // Assuming you have an API endpoint `/api/updateTravelBuddyPost` 
+            // that accepts a PUT request to update the travel post.
+
+            const startDate = values.date[0].format('YYYY-MM-DD');
+            const endDate = values.date[1].format('YYYY-MM-DD');
+            let preference = values.buddyPreference || [];
+
+
+            const additionalInfo = values.additionalInfo;
+
+            // if additional info is empty
+            if (values.additonalInfo === undefined) {
+                values.additonalInfo = "None";
+            }
+
+            // if preference is empty
+            if (preference === undefined) {
+                preference = [];
+            }
+            console.log("preference", preference);
+
+            const editPost = {
+                startDate,
+                endDate,
+                buddyPreference: JSON.stringify(preference),
+                additionalInfo,
+            };
+
+            values.buddyPreference = JSON.stringify(values.buddyPreference);
+
+            console.log("editPost", editPost);
+
+            await axios.put(`/api/updateTravelBuddyPost/${props.postId}`, editPost);
+
+            // If the update is successful, you might want to close the modal and 
+            // give feedback to the user.
+            props.onCancel(); // close the modal
+            // You can use a library like `antd`'s notification to give feedback.
+            notification.success({
+                message: 'Travel Post Updated',
+                description: 'Your travel post has been updated successfully!',
+            });
+
+        } catch (error) {
+            console.error("Error updating travel post:", error);
+            notification.error({
+                message: 'Update Failed',
+                description: 'There was an error updating your travel post. Please try again.',
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
     // Get travelPost Details
     const [initialFormValues, setInitialFormValues] = useState({});
 
@@ -31,12 +89,12 @@ const TravelPostEditModal = (props) => {
                 console.log(travelPost);
                 // Modify this part to handle the format
                 setTimeout(() => {
-                form.setFieldsValue({
-                    buddyPreference: response.data.buddyPreference,
-                    additionalInfo: response.data.additionalInfo,
-                    destination: response.data.destination, 
-                });
-            }, 0);
+                    form.setFieldsValue({
+                        buddyPreference: response.data.buddyPreference,
+                        additionalInfo: response.data.additionalInfo,
+                        destination: response.data.destination,
+                    });
+                }, 0);
                 console.log(response.data.destination);
             } catch (error) {
                 console.error("Error fetching travel post details:", error);
@@ -45,7 +103,7 @@ const TravelPostEditModal = (props) => {
         };
         fetchTravelPost();
     }, [props.postId, form]);
-    
+
 
 
 
@@ -70,12 +128,6 @@ const TravelPostEditModal = (props) => {
         return Promise.resolve();
     };
 
-    const onFinish = async (values) => {
-        // TODO: Implement form submission logic
-        setLoading(true);
-        // e.g., await saveTravelPost(values);
-        setLoading(false);
-    };
     return (
         <Modal
             visible={props.visible}
@@ -127,39 +179,39 @@ const TravelPostEditModal = (props) => {
 
 
                 <Form.Item
-    name="destination"
-    label={
-        <span
-            style={{
-                marginTop: '10px',
-                marginLeft: '3px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: "0.5rem",
-            }}
-        >
-            <CiLocationOn size={24} />
-            Destination
-        </span>
-    }
->
-<Tooltip title="You cannot change your destination">
-    <Input 
-        style={{
-            backgroundColor: '#f5f5f5',
-            borderColor: '#d9d9d9',
-            cursor: 'not-allowed',
-            '&:hover': {
-                borderColor: '#d9d9d9'
-            }
-        }} 
-        readOnly 
-        value={travelPost.destination}
-    />
-</Tooltip>
+                    name="destination"
+                    label={
+                        <span
+                            style={{
+                                marginTop: '10px',
+                                marginLeft: '3px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: "0.5rem",
+                            }}
+                        >
+                            <CiLocationOn size={24} />
+                            Destination
+                        </span>
+                    }
+                >
+                    <Tooltip title="You cannot change your destination">
+                        <Input
+                            style={{
+                                backgroundColor: '#f5f5f5',
+                                borderColor: '#d9d9d9',
+                                cursor: 'not-allowed',
+                                '&:hover': {
+                                    borderColor: '#d9d9d9'
+                                }
+                            }}
+                            readOnly
+                            value={travelPost.destination}
+                        />
+                    </Tooltip>
 
-</Form.Item>
+                </Form.Item>
 
 
 
