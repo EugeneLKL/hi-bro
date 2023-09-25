@@ -237,7 +237,6 @@ const HikingDisplayTrails = ({ searchResults }) => {
     }
   };
   
-
   return (
     <>
       {trailsData.length === 0 ? (

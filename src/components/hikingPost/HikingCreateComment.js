@@ -75,6 +75,7 @@ const HikingCreateComment = ({ postId, profileImage }) => {
           placeholder="Write a comment..."
           value={comment}
           onChange={handleCommentChange}
+          required
         ></textarea>
         <button className="comment-button" type="submit">
           Comment
