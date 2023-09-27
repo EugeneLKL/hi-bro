@@ -56,6 +56,7 @@ const Register = () => {
   const [phoneRegistered, setPhoneRegistered] = useState(false);
 
   const [isPhotoUploaded, setIsPhotoUploaded] = useState(false);
+  
 
   const handleFileChange = async (fileList) => {
     if (fileList.length > 0) {
@@ -164,6 +165,7 @@ const Register = () => {
   };
 
   const emailValidator = (_, value) => {
+    console.log("Validating name:", value);
     if (!value) {
       return Promise.reject(new Error("Please input your email!"));
     }
@@ -179,6 +181,7 @@ const Register = () => {
 
   // Name validator
   const nameValidator = (_, value) => {
+    console.log("Validating name:", value);
     if (!value) {
       return Promise.reject(new Error("Please input your name!"));
     } else {
@@ -186,8 +189,11 @@ const Register = () => {
     }
   };
 
+
+
   // Gender validator
   const genderValidator = (_, value, callback) => {
+    console.log("Validating name:", value);
     if (!value) {
       return callback(new Error(`Please select one option from 'Gender'!`));
     } else {
@@ -282,11 +288,9 @@ const Register = () => {
     // Sending the values get to the backend to be store in the database
 
     if (checkPhone.data === true && checkEmail.data === true) {
-      const confirmed = await modal.confirm(config);
 
-      console.log(confirmed);
 
-      if (confirmed) {
+    
         if (isPhotoUploaded) {
           try {
             // Get the signed URL from the server
@@ -327,9 +331,7 @@ const Register = () => {
         setTimeout(() => {
           window.location.href = "/";
         }, 2000);
-      } else {
-        console.log("Not confirmed");
-      }
+       
     }
   };
 
@@ -449,13 +451,17 @@ const Register = () => {
         {/* Name */}
         <Form.Item
           name="userName"
-          label="Name"
-          rules={[{ validator: nameValidator }]}
-          labelCol={{ span: 6 }} // Set label width
-          wrapperCol={{ span: 18 }} // Set input width
-          style={{ marginBottom: 0 }} // Remove extra margin
+          label="User Name"
+          rules={[
+            {
+              validator: nameValidator,
+            },
+          ]}
+          labelCol={{ span: 6 }}
+          wrapperCol={{ span: 18 }}
+          style={{ marginBottom: 0, marginTop: '20px' }}
         >
-          <Input style={{ height: '50px', }} /> {/* Set a fixed height */}
+          <Input style={{ height: '50px' }} />
         </Form.Item>
 
         {/* Email */}
