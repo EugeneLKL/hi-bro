@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { BiSolidUser, BiDetail } from 'react-icons/bi';
 import { SlCalender, SlLocationPin, SlInfo } from 'react-icons/sl';
 import { TbGenderMale, TbGenderFemale } from 'react-icons/tb';
-import { Card, Col, Row, Button, Avatar, Image, Tabs } from 'antd';
+import { Card, Col, Row, Button, Avatar, Image, Tabs, Modal } from 'antd';
 import axios from 'axios';
 import { useAuth } from '../../AuthContext';
 
@@ -50,6 +50,10 @@ const BuddyRequester = () => {
     const [imageUrl, setImageUrl] = useState('');
     const [acceptedPosts, setAcceptedPosts] = useState([]);
     const [rejectedPosts, setRejectedPosts] = useState([]);
+    const [acceptModalVisible, setAcceptModalVisible] = useState(false);
+    const [rejectModalVisible, setRejectModalVisible] = useState(false);
+    const [currentPostInfo, setCurrentPostInfo] = useState(null); // Store post and requester info
+
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -86,33 +90,56 @@ const BuddyRequester = () => {
         fetchRequestedPosts();
     }, []);
 
-    const handleAccept = async (postId, requesterId) => {
+    const handleAccept = (postId, requesterId) => {
+        // Store the post and requester info
+        setCurrentPostInfo({ postId, requesterId });
+        // Open the Accept confirmation modal
+        setAcceptModalVisible(true);
+    };
+
+    const handleReject = (postId, requesterId) => {
+        // Store the post and requester info
+        setCurrentPostInfo({ postId, requesterId });
+        // Open the Reject confirmation modal
+        setRejectModalVisible(true);
+    };
+
+    const handleAcceptConfirmation = async () => {
         try {
+            // Make an API call to accept the buddy request using currentPostInfo
             const result = await axios.post('/api/acceptBuddyRequest', {
-                userId: requesterId,
-                postId: postId
+                userId: currentPostInfo.requesterId,
+                postId: currentPostInfo.postId,
             });
             console.log(result);
 
-            setAcceptedPosts(prev => [...prev, postId]);
+            // Close the Accept confirmation modal
+            setAcceptModalVisible(false);
+            // Update the acceptedPosts state
+            setAcceptedPosts((prev) => [...prev, currentPostInfo.postId]);
         } catch (error) {
             console.log(error);
         }
     };
 
-    const handleReject = async (postId, requesterId) => {
+    const handleRejectConfirmation = async () => {
         try {
+            // Make an API call to reject the buddy request using currentPostInfo
             const result = await axios.post('/api/rejectBuddyRequest', {
-                userId: requesterId,
-                postId: postId,
+                userId: currentPostInfo.requesterId,
+                postId: currentPostInfo.postId,
             });
             console.log(result);
 
-            setRejectedPosts(prev => [...prev, postId]);
+            // Close the Reject confirmation modal
+            setRejectModalVisible(false);
+            // Update the rejectedPosts state
+            setRejectedPosts((prev) => [...prev, currentPostInfo.postId]);
         } catch (error) {
             console.log(error);
         }
     };
+
 
 
     const groupedPostsByDestination = {};
@@ -227,47 +254,67 @@ const BuddyRequester = () => {
 
 
     return (
-        <div>
-            <Tabs tabPosition="left">
-                {Object.keys(groupedPostsByDestinationAndDate).map(destination => (
-                    <TabPane tab={<span style={{
-                        maxWidth: '150px',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        display: 'inline-block'
+        <>
+            <Modal
+                title="Confirm Acceptance"
+                visible={acceptModalVisible}
+                onOk={handleAcceptConfirmation}
+                onCancel={() => setAcceptModalVisible(false)}
+            >
+                Are you sure you want to accept this buddy request?
+            </Modal>
 
-                    }} className="tab-title">{destination}</span>} key={destination}
-                    >
-                        {Object.keys(groupedPostsByDestinationAndDate[destination])
-                            .sort(sortByDate)  // Use the custom sorting function
-                            .map(date => (
-                                <div key={date}>
-                                    <h4
-                                        style={{
-                                            // marginLeft: '50px',
-                                            marginBottom: '30px',
-                                            marginTop: '10px',
-                                            backgroundColor: '#f7f8fc', // light grayish background
-                                            padding: '5px 15px', // padding around date
-                                            borderRadius: '10px', // rounded corners
-                                            // boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.08)', // subtle drop shadow
-                                            // display: 'inline-block', // to fit the content
-                                            fontWeight: '600' // bolder font
-                                        }}
-                                    >
-                                        {date}
-                                    </h4>
-                                    <Row gutter={[24, 24]} style={{ display: 'flex' }}>
-                                        {groupedPostsByDestinationAndDate[destination][date].map(requestedPost => renderCard(requestedPost))}
-                                    </Row>
-                                </div>
+            <Modal
+                title="Confirm Rejection"
+                visible={rejectModalVisible}
+                onOk={handleRejectConfirmation}
+                onCancel={() => setRejectModalVisible(false)}
+            >
+                Are you sure you want to reject this buddy request?
+            </Modal>
 
-                            ))}
-                    </TabPane>
-                ))}
-            </Tabs>
-        </div>
+            <div>
+                <Tabs tabPosition="left">
+                    {Object.keys(groupedPostsByDestinationAndDate).map(destination => (
+                        <TabPane tab={<span style={{
+                            maxWidth: '150px',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            display: 'inline-block'
+                        }} className="tab-title">{destination}</span>} key={destination}
+                        >
+                            {Object.keys(groupedPostsByDestinationAndDate[destination])
+                                .sort(sortByDate)  // Use the custom sorting function
+                                .map(date => (
+                                    <div key={date}>
+                                        <h4
+                                            style={{
+                                                marginBottom: '30px',
+                                                marginTop: '10px',
+                                                backgroundColor: '#f7f8fc',
+                                                padding: '5px 15px',
+                                                borderRadius: '10px',
+                                                fontWeight: '600'
+                                            }}
+                                        >
+                                            {date}
+                                        </h4>
+                                        {groupedPostsByDestinationAndDate[destination][date] &&
+                                        groupedPostsByDestinationAndDate[destination][date].length > 0 ? (
+                                            <Row gutter={[24, 24]} style={{ display: 'flex' }}>
+                                                {groupedPostsByDestinationAndDate[destination][date].map(requestedPost => renderCard(requestedPost))}
+                                            </Row>
+                                        ) : (
+                                            <p style={{ marginLeft: '20px' }}>No buddy requests for this date.</p>
+                                        )}
+                                    </div>
+                                ))}
+                        </TabPane>
+                    ))}
+                </Tabs>
+            </div>
+        </>
     );
 
 

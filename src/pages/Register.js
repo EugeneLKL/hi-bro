@@ -1,4 +1,5 @@
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, EyeTwoTone, EyeInvisibleOutlined } from "@ant-design/icons";
+
 import React, { useState, useEffect, useRef, createContext } from "react";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import moment from "moment";
@@ -83,8 +84,9 @@ const Register = () => {
       value={prefixNumber}
       // onChange for combining prefix number and phone number entered
       onChange={(e) => setPrefixNumber(e.target.value)}
+      style={{ height: 'auto' }}
     >
-      <Select style={{ width: 70 }}>
+      <Select style={{ width: 70, height: 'auto' }}>
         <Option value="60">+60</Option>
       </Select>
     </Form.Item>
@@ -436,7 +438,9 @@ const Register = () => {
         form={form}
         name="register"
         onFinish={onFinish}
+        labelAlign="left"
         initialValues={{ prefix: "60" }}
+        labelCol={{ span: 6 }}
         // style={{ maxWidth: 600 }}
         scrollToFirstError
       >
@@ -446,13 +450,12 @@ const Register = () => {
         <Form.Item
           name="userName"
           label="Name"
-          rules={[
-            {
-              validator: nameValidator,
-            },
-          ]}
+          rules={[{ validator: nameValidator }]}
+          labelCol={{ span: 6 }} // Set label width
+          wrapperCol={{ span: 18 }} // Set input width
+          style={{ marginBottom: 0 }} // Remove extra margin
         >
-          <Input />
+          <Input style={{ height: '50px', }} /> {/* Set a fixed height */}
         </Form.Item>
 
         {/* Email */}
@@ -464,27 +467,29 @@ const Register = () => {
               validator: emailValidator,
             },
           ]}
+          labelCol={{ span: 6 }}
+          wrapperCol={{ span: 18 }}
+          style={{ marginBottom: 0, marginTop: '20px' }}
         >
-          <Input ref={emailInputRef} />
+          <Input style={{ height: '50px' }} />
         </Form.Item>
 
         {/* Phone number */}
         <Form.Item
           name="phone"
           label="Phone Number"
-          // if the field is empty message will be 'haha', if the phone number has been registered message is hehe
           rules={[
             {
               validator: phoneNumValidator,
             },
           ]}
-          value={phoneNum}
-          // onChange for combining prefix number and phone number entered
+          labelCol={{ span: 6 }}
+          wrapperCol={{ span: 18 }}
+          style={{ marginBottom: 0, marginTop: '20px' }}
         >
           <Input
             addonBefore={prefixSelector}
-            style={{ width: "100%" }}
-            ref={phoneInputRef}
+            style={{ height: '30px', marginBottom: '10px' }}
           />
         </Form.Item>
 
@@ -497,14 +502,12 @@ const Register = () => {
               validator: genderValidator,
             },
           ]}
+          labelCol={{ span: 6 }}
+          wrapperCol={{ span: 18 }}
+          style={{ marginBottom: 0, marginTop: '20px' }}
         >
-          {/* Male will be selected as default */}
-
-          <Radio.Group>
-            <Radio value="Male" defaultChecked>
-              {" "}
-              Male{" "}
-            </Radio>
+          <Radio.Group style={{ marginTop: '13px' }}>
+            <Radio value="Male"> Male </Radio>
             <Radio value="Female"> Female </Radio>
           </Radio.Group>
         </Form.Item>
@@ -518,11 +521,15 @@ const Register = () => {
               validator: birthdateValidator,
             },
           ]}
+          labelCol={{ span: 6 }}
+          wrapperCol={{ span: 18 }}
+          style={{ marginBottom: 0, marginTop: '20px' }}
         >
           <DatePicker
             disabledDate={(current) =>
               current && current >= moment().endOf("day")
             }
+            style={{ height: '50px', padding: 'auto' }}
           />
         </Form.Item>
 
@@ -530,7 +537,6 @@ const Register = () => {
         <Form.Item
           name="password"
           label="Password"
-          // Tooltip for general password requirements
           tooltip={{
             title: passwordRequirements,
           }}
@@ -540,8 +546,14 @@ const Register = () => {
             },
           ]}
           hasFeedback
+          labelCol={{ span: 6 }}
+          wrapperCol={{ span: 18 }}
+          style={{ marginBottom: 0, marginTop: '20px' }}
         >
-          <Input.Password />
+          <Input.Password
+            style={{ height: '50px', padding: 'auto' }}
+            iconRender={(visible) => (visible ? <EyeTwoTone style={{ fontSize: '16px', lineHeight: '40px' }} /> : <EyeInvisibleOutlined style={{ fontSize: '16px', lineHeight: '40px' }} />)}
+          />
         </Form.Item>
 
         {/* Confirm Password */}
@@ -565,18 +577,29 @@ const Register = () => {
             }),
           ]}
           hasFeedback
+          labelCol={{ span: 6 }}
+          wrapperCol={{ span: 18 }}
+          style={{ marginBottom: 0, marginTop: '20px' }}
         >
-          <Input.Password />
+          <Input.Password
+            style={{ height: '50px' }}
+            iconRender={(visible) => (visible ? <EyeTwoTone style={{ fontSize: '16px', lineHeight: '40px' }} /> : <EyeInvisibleOutlined style={{ fontSize: '16px', lineHeight: '40px' }} />)}
+          />
         </Form.Item>
+
+
 
         {/* Profile Photo */}
         <Form.Item
           label="Profile Picture"
           valuePropName="fileList"
           getValueFromEvent={normFile}
+          labelCol={{ span: 6 }}
+          wrapperCol={{ span: 18 }}
+          style={{ marginBottom: 0, marginTop: '20px' }}
         >
           <Upload
-            action="https://www.mocky.io/v2/5cc8019d300000980a055e76" // Replace with your actual upload endpoint
+            action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
             listType="picture-card"
             fileList={fileList}
             onPreview={handlePreview}
@@ -587,15 +610,15 @@ const Register = () => {
                 message.error("You can only upload PNG, JPG, or JPEG images.");
                 return false;
               }
-              // Clear the fileList and set the new selected file
               setFileList([file]);
               setSelectedFile(file);
-              return false; // Prevent automatic upload
+              return false;
             }}
           >
             {fileList.length >= 1 ? null : uploadButton}
           </Upload>
         </Form.Item>
+
 
         {/* Register Button */}
         <div className="register-button">

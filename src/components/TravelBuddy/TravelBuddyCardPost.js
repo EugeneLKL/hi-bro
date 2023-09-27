@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Col, Row, Image, Button, Pagination } from 'antd';
+import { Card, Col, Row, Image, Button, Pagination, Modal, Input, DatePicker, Select } from 'antd';
 import { useAuth } from '../../AuthContext';
-import { BiSolidUser, BiDetail } from 'react-icons/bi'
-import { SlCalender, SlLocationPin, SlInfo } from 'react-icons/sl'
-import { MdOutlineDone } from 'react-icons/md'
+import { BiSolidUser, BiDetail } from 'react-icons/bi';
+import { SlCalender, SlLocationPin, SlInfo } from 'react-icons/sl';
+import { MdOutlineDone } from 'react-icons/md';
 import axios from 'axios';
+
+const { RangePicker } = DatePicker;
+const { Option } = Select;
 
 const TravelBuddyCardPost = () => {
     const { userId } = useAuth();
@@ -15,11 +18,30 @@ const TravelBuddyCardPost = () => {
     const [requestButtonStates, setRequestButtonStates] = useState({}); // Track button text for each post
 
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;  // or whatever number you want
+    const itemsPerPage = 10; // or whatever number you want
+
+    // Filters
+    const [destinationFilter, setDestinationFilter] = useState('');
+    const [dateRangeFilter, setDateRangeFilter] = useState([]);
+    const [buddyPreferenceFilter, setBuddyPreferenceFilter] = useState('');
 
     const indexOfLastPost = currentPage * itemsPerPage;
     const indexOfFirstPost = indexOfLastPost - itemsPerPage;
     const currentPosts = posts.slice(indexOfFirstPost, indexOfLastPost);
+    const [genderFilter, setGenderFilter] = useState('');
+
+    const [filteredPosts, setFilteredPosts] = useState([]);
+
+    const [selectedPreferences, setSelectedPreferences] = useState([]);
+
+
+
+    useEffect(() => {
+        setFilteredPosts(posts); // Initialize with all posts
+    }, [posts]);
+
+
+
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
@@ -140,161 +162,278 @@ const TravelBuddyCardPost = () => {
         }
     };
 
+    const handleFilter = () => {
+        const isAnyFilterActive =
+            destinationFilter ||
+            dateRangeFilter.length > 0 ||
+            genderFilter ||
+            selectedPreferences.length > 0;
+
+        if (!isAnyFilterActive) {
+            // No filters active, display all posts
+            setFilteredPosts(posts);
+            setCurrentPage(1);
+            return;
+        }
+
+        const filteredPosts = posts.filter((post) => {
+            const postStartDate = new Date(post.startDate);
+            const postEndDate = new Date(post.endDate);
+
+            const filterStartDate = new Date(dateRangeFilter[0]);
+            const filterEndDate = new Date(dateRangeFilter[1]);
+
+            const isDestinationMatch =
+                !destinationFilter || post.destination.toLowerCase().includes(destinationFilter.toLowerCase());
+            const isDateRangeMatch =
+                !dateRangeFilter.length ||
+                (postStartDate >= filterStartDate && postEndDate <= filterEndDate);
+            const isGenderMatch =
+                !genderFilter || post.creator.gender.toLowerCase() === genderFilter.toLowerCase();
+            const isPreferenceMatch =
+                selectedPreferences.length === 0 || post.buddyPreference.some(p => selectedPreferences.includes(p));
+
+            return isDestinationMatch && isDateRangeMatch && isGenderMatch && isPreferenceMatch;
+        });
+
+        setFilteredPosts(filteredPosts);
+        setCurrentPage(1);
+    };
+
+
+
+
+    // Create a function to clear all filters
+    const clearFilters = () => {
+        setDestinationFilter(''); // Reset destination filter
+        setDateRangeFilter([]);   // Reset date range filter
+        setBuddyPreferenceFilter(''); // Reset buddy preference filter
+        setGenderFilter('');       // Reset gender filter
+        // You can add more filter states here and reset them as needed
+    };
+
+    // Add an event handler for destination input change
+    const handleDestinationInputChange = (e) => {
+        setDestinationFilter(e.target.value);
+    };
+
+
+
     return (
-        <div
-            style={{
-                width: '100%',
-                // border: '1px solid red'
-            }}>
+        <div style={{ width: '100%' }}>
+            <div style={{ marginBottom: '20px' }}>
+                <Input placeholder="Search Destination" value={destinationFilter} onChange={(e) => setDestinationFilter(e.target.value)} />
+
+                <div
+                    style={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center',
+                        marginTop: '10px',
+                    }}
+                >
+                    <div
+               
+                    >
+                        <RangePicker 
+                        onChange={(dates, dateStrings) => setDateRangeFilter(dateStrings)} />
+
+                        {/* Use the preferenceOptions array to generate Select options */}
+                        <Select
+                            value={selectedPreferences}
+                            onChange={(values) => setSelectedPreferences(values)}
+                            placeholder="Select Preferences"
+                            mode="multiple"
+                            style={{
+                                width: '200px',
+                                marginLeft: '10px',
+                            }}
+                        >
+                            <Option value="Shopping">Shopping</Option>
+                            <Option value="Energy">Energy</Option>
+                            <Option value="Safety Consciousness">Safety Consciousness</Option>
+                            <Option value="Photography">Photography</Option>
+                            <Option value="Food">Food</Option>
+                            <Option value="Languages">Languages</Option>
+                        </Select>
+
+
+                        <Select
+                            value={genderFilter}
+                            onChange={(value) => setGenderFilter(value)}
+                            placeholder="Select Gender"
+                            style={{
+                                height: 'auto',
+                                width: '200px',
+                                marginLeft: '10px'
+
+                            }}
+                        >
+                            <Option value="male">Male</Option>
+                            <Option value="female">Female</Option>
+                        </Select>
+                    </div>
+                    <div>
+                        <Button onClick={handleFilter}>Apply Filters</Button>
+                        <Button onClick={clearFilters} style={{ marginLeft: '10px' }}>Clear Filters</Button>
+                    </div>
+                </div>
+            </div>
             <Row
                 gutter={[16, 16]}
                 style={{
                     display: 'flex',
                 }}
             >
-                {currentPosts.map(post => (
-                    <Col
-                        key={post.id}
-                        span={12}
-                    >
-                        <Card
-                            style={{
-                                minHeight: '250px',
-                                maxHeight: '350px',
-                                width: '600px'
-                            }}>
-                            <Meta
-                                avatar={
-                                    <Image src={post.creator.profileImage}
-                                        alt='Profile'
-                                        className='profile-profilePic'
-                                        width={100}
-                                        height={100}
-                                        preview={false}
-                                        style={{
-                                            marginLeft: 25
-                                        }}
-                                    />}
-                                title={
-                                    <span
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            marginTop: 20,
-                                            marginLeft: 50
-                                        }}>
-                                        <BiSolidUser
-                                            style={{
-                                                marginRight: '8px'
-                                            }} />
-                                        {post.creator.userName}
-                                    </span>
-                                }
-                                description={
-                                    <span
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            marginLeft: 50
-                                        }}>
-                                        <BiDetail
-                                            style={{ marginRight: '8px' }}
-                                        />
-                                        {post.creator.gender}
-                                        <span
-                                            style={{ marginLeft: '8px' }}
-                                        >
-                                            ({calculateAge(post.creator.birthDate)} years old)
-                                        </span>
-                                    </span>
-                                }
+                {filteredPosts.length === 0 ? ( // Check if there are no filtered posts
+                    <div style={{ width: '100%', textAlign: 'center', padding: '20px' }}>
+                        <p>No posts to display.</p>
+                    </div>
+                ) : (
+                    filteredPosts.map(post => (
+                        <Col
+                            key={post.id}
+                            span={12}
+                        >
+                            <Card
                                 style={{
-                                    borderBottom: '1px solid #dcdcdc',
-                                    paddingBottom: '5px',
-                                    marginBottom: '12px'
-                                }}
-                            />
-                            <p
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                }}><SlLocationPin style={{ marginRight: '10px', marginLeft: '8px' }} />{post.destination}
-                                </p>
-                            <p
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    marginTop: '8px',
-
+                                    minHeight: '250px',
+                                    maxHeight: '350px',
+                                    width: '600px'
                                 }}>
-                                <SlCalender style={{
-                                    marginRight: '10px',
-                                    marginLeft: '8px',
-                                }} />
-                                {formatDate(post.startDate)} - {formatDate(post.endDate)}
-                                {/* Make a space */}
-                                {'  '}
-                                ({calculateTripDuration(post.startDate, post.endDate)} Days)
-                            </p>
-                            
-                            {/* Display buddy preference which is an array line by line */}
-                            {post.additionalInfo && (
+                                <Meta
+                                    avatar={
+                                        <Image src={post.creator.profileImage}
+                                            alt='Profile'
+                                            className='profile-profilePic'
+                                            width={100}
+                                            height={100}
+                                            preview={false}
+                                            style={{
+                                                marginLeft: 25
+                                            }}
+                                        />}
+                                    title={
+                                        <span
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                marginTop: 20,
+                                                marginLeft: 50
+                                            }}>
+                                            <BiSolidUser
+                                                style={{
+                                                    marginRight: '8px'
+                                                }} />
+                                            {post.creator.userName}
+                                        </span>
+                                    }
+                                    description={
+                                        <span
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                marginLeft: 50
+                                            }}>
+                                            <BiDetail
+                                                style={{ marginRight: '8px' }}
+                                            />
+                                            {post.creator.gender}
+                                            <span
+                                                style={{ marginLeft: '8px' }}
+                                            >
+                                                ({calculateAge(post.creator.birthDate)} years old)
+                                            </span>
+                                        </span>
+                                    }
+                                    style={{
+                                        borderBottom: '1px solid #dcdcdc',
+                                        paddingBottom: '5px',
+                                        marginBottom: '12px'
+                                    }}
+                                />
+                                <p
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                    }}><SlLocationPin style={{ marginRight: '10px', marginLeft: '8px' }} />{post.destination}
+                                </p>
                                 <p
                                     style={{
                                         display: 'flex',
                                         alignItems: 'center',
                                         marginTop: '8px',
+
                                     }}>
-                                    <SlInfo style={{ marginRight: '10px', marginLeft: '8px' }} />
-                                    {post.additionalInfo}
+                                    <SlCalender style={{
+                                        marginRight: '10px',
+                                        marginLeft: '8px',
+                                    }} />
+                                    {formatDate(post.startDate)} - {formatDate(post.endDate)}
+                                    {/* Make a space */}
+                                    {'  '}
+                                    ({calculateTripDuration(post.startDate, post.endDate)} Days)
                                 </p>
-                            )}
-                            <ul
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    listStyleType: 'none', // Remove bullet points
-                                    padding: 0, // Remove default padding
-                                    flexWrap: 'wrap', // Wrap items to the next line
-                                }}
-                                className='travel-post-preference'>
-                                {post.buddyPreference.map((preference, index) => (
-                                    <li key={index}>{preference}</li>
-                                ))}
-                            </ul>
-                            <Button
-                                onClick={() => handleRequest(post.travelPostId)}
-                                style={{
-                                    position: 'absolute',
-                                    bottom: 0,
-                                    right: 0,
-                                    margin: '18px',
-                                }}
-                                loading={loadingStates[post.travelPostId] || false} // Use loading state for the current post
-                                disabled={requestButtonStates[post.travelPostId] === 'Requested'}
-                            >
-                                {requestButtonStates[post.travelPostId] === 'Requested' ? (
-                                    <>
-                                        <span
-                                            style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                            }}>
-                                            <MdOutlineDone style={{ marginRight: '5px' }} />
-                                            Requested
-                                        </span>
-                                    </>
-                                ) : (
-                                    requestButton
+
+                                {/* Display buddy preference which is an array line by line */}
+                                {post.additionalInfo && (
+                                    <p
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            marginTop: '8px',
+                                        }}>
+                                        <SlInfo style={{ marginRight: '10px', marginLeft: '8px' }} />
+                                        {post.additionalInfo}
+                                    </p>
                                 )}
-                            </Button>
-                        </Card>
-                    </Col>
-                ))}
+                                <ul
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        listStyleType: 'none', // Remove bullet points
+                                        padding: 0, // Remove default padding
+                                        flexWrap: 'wrap', // Wrap items to the next line
+                                    }}
+                                    className='travel-post-preference'>
+                                    {post.buddyPreference.map((preference, index) => (
+                                        <li key={index}>{preference}</li>
+                                    ))}
+                                </ul>
+                                <Button
+                                    onClick={() => handleRequest(post.travelPostId)}
+                                    style={{
+                                        position: 'absolute',
+                                        bottom: 0,
+                                        right: 0,
+                                        margin: '18px',
+                                    }}
+                                    loading={loadingStates[post.travelPostId] || false} // Use loading state for the current post
+                                    disabled={requestButtonStates[post.travelPostId] === 'Requested'}
+                                >
+                                    {requestButtonStates[post.travelPostId] === 'Requested' ? (
+                                        <>
+                                            <span
+                                                style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                }}>
+                                                <MdOutlineDone style={{ marginRight: '5px' }} />
+                                                Requested
+                                            </span>
+                                        </>
+                                    ) : (
+                                        requestButton
+                                    )}
+                                </Button>
+                            </Card>
+                        </Col>
+                    ))
+                )}
             </Row>
             {/* Pagination component */}
             {posts.length > itemsPerPage && (
-                <Pagination 
+                <Pagination
                     current={currentPage}
                     total={posts.length}
                     pageSize={itemsPerPage}

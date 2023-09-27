@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar, Card, Col, Row, Button, Tabs, Image, message } from 'antd';
+import { Avatar, Card, Col, Row, Button, Tabs, Image, message, Modal, Empty } from 'antd';
 import axios from 'axios';
 import { useAuth } from '../../AuthContext';
 import { AiOutlineWhatsApp, AiOutlineMail } from 'react-icons/ai'
@@ -12,6 +12,26 @@ const BuddyMatched = () => {
     const { userId, userName } = useAuth();
     const [matchedBuddies, setMatchedBuddies] = useState([]);
     const [searchBuddies, setSerachBuddies] = useState([]);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [currentBuddyToUnpair, setCurrentBuddyToUnpair] = useState(null);
+
+    const showModal = (buddy) => {
+        setCurrentBuddyToUnpair(buddy);
+        setIsModalVisible(true);
+    };
+
+    const handleOk = async () => {
+        setIsModalVisible(false);
+        if (currentBuddyToUnpair) {
+            handleUnpair(currentBuddyToUnpair);
+        }
+    };
+
+    const handleCancel = () => {
+        setIsModalVisible(false);
+        setCurrentBuddyToUnpair(null);
+    };
+
 
     const avatarIconStyle = {
         marginRight: '20px',
@@ -100,22 +120,22 @@ const BuddyMatched = () => {
                     requesterId: userId,
                 }
             });
-            
+
             // Show a success message for 2 seconds
             message.success('Successfully unpaired!', 2);
-    
+
             // Use setTimeout to wait for 2 seconds before filtering out the matchedBuddies
             setTimeout(() => {
                 const newMatchedBuddies = matchedBuddies.filter(matchedBuddy => matchedBuddy.travelPostId !== buddy.travelPostId);
                 setMatchedBuddies(newMatchedBuddies);
             }, 2000);
-            
+
         } catch (error) {
             console.log(error);
             message.error('Error occurred while unpairing. Please try again.', 2);
-        }  
+        }
     };
-    
+
 
 
     const redirectToWhatsApp = (phoneNumber) => {
@@ -192,9 +212,10 @@ const BuddyMatched = () => {
                         Contact
                     </Button>
 
-                    <Button type="primary" danger onClick={() => handleUnpair(buddy)}>
+                    <Button type="primary" danger onClick={() => showModal(buddy)}>
                         Unpair Buddy
                     </Button>
+
                 </div>
             </Card>
         </Col>
@@ -215,41 +236,60 @@ const BuddyMatched = () => {
         groupedBuddiesByDestinationAndDate[destination] = sortedBuddiesForDestination;
     }
 
+    const confirmationModal = (
+        <Modal
+            title="Confirm Action"
+            visible={isModalVisible}
+            onOk={handleOk}
+            onCancel={handleCancel}
+        >
+            <p>Are you sure you want to unpair?</p>
+        </Modal>
+    );
+    
+// Define the message to display when there are no matched buddies
+const noBuddiesMatchedMessage = (
+    <Empty description="No buddies matched yet. Try exploring the posts more." />
+);
 
-    return (
-        <div>
-            <Tabs tabPosition="left">
-                {Object.keys(groupedBuddiesByDestinationAndDate).map(destination => (
-                    <TabPane tab={<span style={{
-                        maxWidth: '150px',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        display: 'inline-block'
-
-                    }} className="tab-title">{destination}</span>} key={destination}>
-                        {Object.keys(groupedBuddiesByDestinationAndDate[destination]).map(date => (
-                            <div key={date}>
-                                <h4 style={{
-                                    marginBottom: '30px',
-                                    marginTop: '10px',
-                                    backgroundColor: '#f7f8fc',
-                                    padding: '5px 15px',
-                                    borderRadius: '10px',
-                                    fontWeight: '600'
-                                }}>
-                                    {date}
-                                </h4>
+return (
+    <div>
+        {confirmationModal}
+        <Tabs tabPosition="left">
+            {Object.keys(groupedBuddiesByDestinationAndDate).map(destination => (
+                <TabPane tab={<span style={{
+                    maxWidth: '150px',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    display: 'inline-block'
+                }} className="tab-title">{destination}</span>} key={destination}>
+                    {Object.keys(groupedBuddiesByDestinationAndDate[destination]).map(date => (
+                        <div key={date}>
+                            <h4 style={{
+                                marginBottom: '30px',
+                                marginTop: '10px',
+                                backgroundColor: '#f7f8fc',
+                                padding: '5px 15px',
+                                borderRadius: '10px',
+                                fontWeight: '600'
+                            }}>
+                                {date}
+                            </h4>
+                            {groupedBuddiesByDestinationAndDate[destination][date].length > 0 ? (
                                 <Row gutter={[16, 16]}>
                                     {groupedBuddiesByDestinationAndDate[destination][date].map(buddy => renderCard(buddy))}
                                 </Row>
-                            </div>
-                        ))}
-                    </TabPane>
-                ))}
-            </Tabs>
-        </div>
-    );
+                            ) : (
+                                noBuddiesMatchedMessage
+                            )}
+                        </div>
+                    ))}
+                </TabPane>
+            ))}
+        </Tabs>
+    </div>
+);
 
 }
 

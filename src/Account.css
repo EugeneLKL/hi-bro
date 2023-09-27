@@ -11,7 +11,29 @@
   /* padding: 50px; */
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
   border-radius: 10px;
-  height: 665px;
+  height: 650px;
+  /* In the middle of any size of screen */
+  margin: auto;
+  margin-top: 25px;
+  margin-bottom: 25px;
+  /* Make the form responsive */
+  @media (max-width: 768px) {
+    width: 100%;
+    height: auto;
+    margin-top: 0px;
+    margin-bottom: 0px;
+  }
+}
+
+.register-form {
+  width: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* padding: 50px; */
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  border-radius: 10px;
+  height: 780px;
   /* In the middle of any size of screen */
   margin: auto;
   margin-top: 25px;
@@ -153,3 +175,17 @@
 ::-webkit-scrollbar {
   display: none;
 }
+
+.ant-col-6{
+  display: flex;
+  align-items: center;
+  /* border: #141E30 solid 1px; */
+  margin-top: 7px;
+  height: 35px;
+}
+
+.ant-input-group-addon{
+  border: #141E30 1px solid;
+}
+
+

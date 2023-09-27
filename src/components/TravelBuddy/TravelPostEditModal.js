@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, DatePicker, Modal, Form, Checkbox, Col, Row, Input, Tooltip, notification } from 'antd';
+import { Button, DatePicker, Modal, Form, Checkbox, Col, Row, Input, Tooltip, notification, message } from 'antd';
 import { PiPuzzlePieceLight } from 'react-icons/pi';
 import { CiCalendarDate, CiLocationOn } from "react-icons/ci";
 import { IoIosInformationCircleOutline } from 'react-icons/io';
@@ -17,6 +17,9 @@ const TravelPostEditModal = (props) => {
     const { TextArea } = Input;
     const [loading, setLoading] = useState(false);
     const [travelPost, setTravelPost] = useState({});
+    const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
+
+
 
     const onFinish = async (values) => {
         setLoading(true);
@@ -60,10 +63,7 @@ const TravelPostEditModal = (props) => {
             // give feedback to the user.
             props.onCancel(); // close the modal
             // You can use a library like `antd`'s notification to give feedback.
-            notification.success({
-                message: 'Travel Post Updated',
-                description: 'Your travel post has been updated successfully!',
-            });
+            message.success('Post Updated Successfully!', 3);
 
         } catch (error) {
             console.error("Error updating travel post:", error);
@@ -129,176 +129,189 @@ const TravelPostEditModal = (props) => {
     };
 
     return (
-        <Modal
-            visible={props.visible}
-            onCancel={props.onCancel}
-            title={travelPost.destination}
-            width={650}
-            footer={[
-                <Button key="cancel" onClick={props.onCancel}>
-                    Cancel
-                </Button>,
-                <Button key="save" type="primary" loading={loading} onClick={() => form.submit()}>
-                    Confirm
-                </Button>,
-            ]}
-        >
-            <Form
-                form={form}
-                onFinish={onFinish}
-                labelCol={{ span: 10 }}
-                wrapperCol={{ span: 25 }}
-                layout="vertical"
-                scrollToFirstError
+        <>
+            <Modal
+                title="Confirm Changes"
+                visible={isConfirmationModalVisible}
+                onOk={form.submit}
+                onCancel={() => setIsConfirmationModalVisible(false)}
+                okText="Yes"
+                cancelText="No"
             >
-                <Form.Item
-                    name="date"
-                    label={
-                        <span
-                            style={{
-                                marginTop: '10px',
-                                marginLeft: '3px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: "0.5rem",
-                            }}
-                        >
-                            <CiCalendarDate size={24} />
-                            Date
-                        </span>
-                    }
-                    rules={[
-                        {
-                            validator: rangePickerValidator,
-                        },
-                    ]}
+                Are you sure you want to save these changes?
+            </Modal>
+
+            <Modal
+                visible={props.visible}
+                onCancel={props.onCancel}
+                title={travelPost.destination}
+                width={650}
+                footer={[
+                    <Button key="cancel" onClick={props.onCancel}>
+                        Cancel
+                    </Button>,
+                    <Button key="save" type="primary" loading={loading} onClick={() => setIsConfirmationModalVisible(true)}>
+                        Confirm
+                    </Button>
+                    ,
+                ]}
+            >
+                <Form
+                    form={form}
+                    onFinish={onFinish}
+                    labelCol={{ span: 10 }}
+                    wrapperCol={{ span: 25 }}
+                    layout="vertical"
+                    scrollToFirstError
                 >
-                    <RangePicker format="DD-MM-YYYY" disabledDate={disabledDate} />
-                </Form.Item>
-
-
-                <Form.Item
-                    name="destination"
-                    label={
-                        <span
-                            style={{
-                                marginTop: '10px',
-                                marginLeft: '3px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: "0.5rem",
-                            }}
-                        >
-                            <CiLocationOn size={24} />
-                            Destination
-                        </span>
-                    }
-                >
-                    <Tooltip title="You cannot change your destination">
-                        <Input
-                            style={{
-                                backgroundColor: '#f5f5f5',
-                                borderColor: '#d9d9d9',
-                                cursor: 'not-allowed',
-                                '&:hover': {
-                                    borderColor: '#d9d9d9'
-                                }
-                            }}
-                            readOnly
-                            value={travelPost.destination}
-                        />
-                    </Tooltip>
-
-                </Form.Item>
-
-
-
-
-                <Form.Item
-                    name="buddyPreference"
-                    label={
-                        <span
-                            style={{
-                                marginTop: '10px',
-                                marginLeft: '3px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: "0.5rem",
-                            }}
-                        >
-                            <PiPuzzlePieceLight size={24} />
-                            Preference
-                        </span>
-                    }
-                >
-                    <CheckboxGroup
-                        style={{ marginLeft: '3px', width: 600 }}
+                    <Form.Item
+                        name="date"
+                        label={
+                            <span
+                                style={{
+                                    marginTop: '10px',
+                                    marginLeft: '3px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: "0.5rem",
+                                }}
+                            >
+                                <CiCalendarDate size={24} />
+                                Date
+                            </span>
+                        }
+                        rules={[
+                            {
+                                validator: rangePickerValidator,
+                            },
+                        ]}
                     >
-                        <Row>
-                            <Col span={7}>
-                                <Checkbox value="Shopping" style={{ lineHeight: '32px' }} defaultChecked >
-                                    Shopping
-                                </Checkbox>
-                            </Col>
-                            <Col span={7}>
-                                <Checkbox value="Energy" style={{ lineHeight: '32px' }} defaultChecked>
-                                    Energy
-                                </Checkbox>
-                            </Col>
-                            <Col span={7}>
-                                <Checkbox value="Safety Consciousness" style={{ lineHeight: '32px' }}>
-                                    Safety Consciousness
-                                </Checkbox>
-                            </Col>
-                            <Col span={7}>
-                                <Checkbox value="Photography" style={{ lineHeight: '32px' }}>
-                                    Photography
-                                </Checkbox>
-                            </Col>
-                            <Col span={7}>
-                                <Checkbox value="Food" style={{ lineHeight: '32px' }}>
-                                    Food
-                                </Checkbox>
-                            </Col>
+                        <RangePicker format="DD-MM-YYYY" disabledDate={disabledDate} />
+                    </Form.Item>
 
-                            <Col span={7}>
-                                <Checkbox value="Languages" style={{ lineHeight: '32px' }}>
-                                    Languages
-                                </Checkbox>
-                            </Col>
-                        </Row>
-                    </CheckboxGroup>
-                </Form.Item>
 
-                <Form.Item
-                    name='additionalInfo'
-                    label={
-                        <span
-                            style={{
-                                marginTop: '10px',
-                                marginLeft: '3px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: "0.5rem",
-                            }}
+                    <Form.Item
+                        name="destination"
+                        label={
+                            <span
+                                style={{
+                                    marginTop: '10px',
+                                    marginLeft: '3px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: "0.5rem",
+                                }}
+                            >
+                                <CiLocationOn size={24} />
+                                Destination
+                            </span>
+                        }
+                    >
+                        <Tooltip title="You cannot change your destination">
+                            <Input
+                                style={{
+                                    backgroundColor: '#f5f5f5',
+                                    borderColor: '#d9d9d9',
+                                    cursor: 'not-allowed',
+                                    '&:hover': {
+                                        borderColor: '#d9d9d9'
+                                    }
+                                }}
+                                readOnly
+                                value={travelPost.destination}
+                            />
+                        </Tooltip>
+
+                    </Form.Item>
+
+
+
+
+                    <Form.Item
+                        name="buddyPreference"
+                        label={
+                            <span
+                                style={{
+                                    marginTop: '10px',
+                                    marginLeft: '3px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: "0.5rem",
+                                }}
+                            >
+                                <PiPuzzlePieceLight size={24} />
+                                Preference
+                            </span>
+                        }
+                    >
+                        <CheckboxGroup
+                            style={{ marginLeft: '3px', width: 600 }}
                         >
-                            <IoIosInformationCircleOutline size={24} />
-                            Others
-                        </span>
-                    }>
-                    <TextArea
-                        rows={3}
-                        placeholder={'Add any additional information here...'}
-                        defaultValue={travelPost.additionalInfo}
-                    />
-                </Form.Item>
-            </Form>
-        </Modal>
+                            <Row>
+                                <Col span={7}>
+                                    <Checkbox value="Shopping" style={{ lineHeight: '32px' }} defaultChecked >
+                                        Shopping
+                                    </Checkbox>
+                                </Col>
+                                <Col span={7}>
+                                    <Checkbox value="Energy" style={{ lineHeight: '32px' }} defaultChecked>
+                                        Energy
+                                    </Checkbox>
+                                </Col>
+                                <Col span={7}>
+                                    <Checkbox value="Safety Consciousness" style={{ lineHeight: '32px' }}>
+                                        Safety Consciousness
+                                    </Checkbox>
+                                </Col>
+                                <Col span={7}>
+                                    <Checkbox value="Photography" style={{ lineHeight: '32px' }}>
+                                        Photography
+                                    </Checkbox>
+                                </Col>
+                                <Col span={7}>
+                                    <Checkbox value="Food" style={{ lineHeight: '32px' }}>
+                                        Food
+                                    </Checkbox>
+                                </Col>
 
+                                <Col span={7}>
+                                    <Checkbox value="Languages" style={{ lineHeight: '32px' }}>
+                                        Languages
+                                    </Checkbox>
+                                </Col>
+                            </Row>
+                        </CheckboxGroup>
+                    </Form.Item>
+
+                    <Form.Item
+                        name='additionalInfo'
+                        label={
+                            <span
+                                style={{
+                                    marginTop: '10px',
+                                    marginLeft: '3px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: "0.5rem",
+                                }}
+                            >
+                                <IoIosInformationCircleOutline size={24} />
+                                Others
+                            </span>
+                        }>
+                        <TextArea
+                            rows={3}
+                            placeholder={'Add any additional information here...'}
+                            defaultValue={travelPost.additionalInfo}
+                        />
+                    </Form.Item>
+                </Form>
+            </Modal>
+        </>
     );
 }
 

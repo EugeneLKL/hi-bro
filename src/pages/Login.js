@@ -6,53 +6,53 @@ import axios from 'axios';
 import { useAuth } from '../AuthContext';
 
 const Login = () => {
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  const { handleLogin } = useAuth(); // Get the handleLogin function from AuthContext
+    const { handleLogin } = useAuth(); // Get the handleLogin function from AuthContext
 
-  const emailRef = useRef(null);
-  const pwdRef = useRef(null);
+    const emailRef = useRef(null);
+    const pwdRef = useRef(null);
 
-  const [form] = Form.useForm();
+    const [form] = Form.useForm();
 
-  const onFinish = async (values) => {
-    const userEmail = values['email'];
-    const userPwd = values['password'];
+    const onFinish = async (values) => {
+        const userEmail = values['email'];
+        const userPwd = values['password'];
 
-    const checkUserRegister = await axios.get('/api/checkUserRegister', {
-      params: { userEmail: userEmail },
-    });
-
-    if (checkUserRegister.data) {
-      if (checkUserRegister.data.password === userPwd) {
-        message.success('Login Successfully!');
-
-        const userId = checkUserRegister.data.userId;
-        const userName = checkUserRegister.data.userName;
-
-        // Use handleLogin function to update authentication status and user ID
-        handleLogin(userId, userName);
-        
-        // Redirect to the profile page
-        navigate(`/connector`);
-      } else {
-        // If the password is incorrect
-        message.error('Incorrect password');
-        form.setFieldsValue({
-          password: '',
+        const checkUserRegister = await axios.get('/api/checkUserRegister', {
+            params: { userEmail: userEmail },
         });
-        pwdRef.current.focus();
-      }
-    } else {
-      // If the user has not registered
-      message.error('Please register first');
-      // Clear all the fields
-      form.setFieldsValue({
-        email: '',
-        password: '',
-      });
-    }
-  };
+
+        if (checkUserRegister.data) {
+            if (checkUserRegister.data.password === userPwd) {
+                message.success('Login Successfully!');
+
+                const userId = checkUserRegister.data.userId;
+                const userName = checkUserRegister.data.userName;
+
+                // Use handleLogin function to update authentication status and user ID
+                handleLogin(userId, userName);
+
+                // Redirect to the profile page
+                navigate(`/connector`);
+            } else {
+                // If the password is incorrect
+                message.error('Incorrect password');
+                form.setFieldsValue({
+                    password: '',
+                });
+                pwdRef.current.focus();
+            }
+        } else {
+            // If the user has not registered
+            message.error('Please register first');
+            // Clear all the fields
+            form.setFieldsValue({
+                email: '',
+                password: '',
+            });
+        }
+    };
 
     return (
         <div className='login-form'>
@@ -79,10 +79,18 @@ const Login = () => {
                         },
                     ]}
                 >
-                    {/* INput for email as login */}
-                    <Input prefix={<MailOutlined className="site-form-item-icon" style={{marginRight: '10px'}}/>} placeholder="Email" ref={emailRef} />
+                    <Input
+                        style={{ display: 'flex', alignItems: 'center' }}
+                        prefix={
+                            <MailOutlined className="site-form-item-icon" style={{ marginRight: '10px', }} />
+                        }
+                        placeholder="Email"
+                        ref={emailRef}
+                    />
                 </Form.Item>
+
                 <Form.Item
+                    style={{ marginTop: '30px' }}
                     name="password"
                     rules={[
                         {
@@ -92,12 +100,14 @@ const Login = () => {
                     ]}
                 >
                     <Input.Password
-                        prefix={<LockOutlined className="site-form-item-icon" style={{marginRight: '10px'}}/>}
+                        style={{ height: '50px' }}
+                        prefix={<LockOutlined className="site-form-item-icon" style={{ marginRight: '10px' }} />}
                         type="password"
                         placeholder="Password"
                         ref={pwdRef}
                     />
                 </Form.Item>
+
                 <Form.Item>
                     {/* <Form.Item name="remember" valuePropName="checked" noStyle>
                         <Checkbox>Remember me</Checkbox>

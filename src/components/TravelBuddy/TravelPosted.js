@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, Col, Row, Image, Button, Modal, Pagination, Tooltip } from 'antd';
+import { Card, Col, Row, Image, Button, Modal, Pagination, Tooltip, message } from 'antd';
 import { useAuth } from '../../AuthContext';
 import { BiSolidUser, BiDetail } from 'react-icons/bi'
 import { SlCalender, SlLocationPin, SlInfo } from 'react-icons/sl'
@@ -21,6 +21,8 @@ const TravelPosted = () => {
     const [editPostData, setEditPostData] = useState(null);
     const [buddyInfo, setBuddyInfo] = useState(null);
     const [buddyNames, setBuddyNames] = useState({});
+    const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
+
 
 
 
@@ -59,8 +61,12 @@ const TravelPosted = () => {
             console.log(response);
             setIsEditPostModalVisible(false);
             setRerender(!rerender);
+
+            // Display a success message
+        message.success('Post edited successfully!');
         } catch (error) {
             console.log(error);
+            message.error('Failed to edit post.');
         }
     }
 
@@ -105,8 +111,12 @@ const TravelPosted = () => {
             const response = await axios.delete(`/api/deleteTravelBuddyPost/${id}`);
             console.log(response);
             setRerender(!rerender);
+
+            // Display a success message
+            message.success('Post deleted successfully!');
         } catch (error) {
             console.log(error);
+            message.error('Failed to delete post.');
         }
     };
 
@@ -138,9 +148,9 @@ const TravelPosted = () => {
             const buddyData = response.data;
             console.log(buddyData.phoneNum);
             const text = `Hi, I'm reaching out regarding our matched trip on the Hi-Bro (Travel Buddy) platform. Nice to meet you! I'm ${userName}!`;
-        const encodedText = encodeURIComponent(text);
-        const whatsappUrl = `https://wa.me/${buddyData.phoneNum}?text=${encodedText}`;
-        window.open(whatsappUrl, '_blank');
+            const encodedText = encodeURIComponent(text);
+            const whatsappUrl = `https://wa.me/${buddyData.phoneNum}?text=${encodedText}`;
+            window.open(whatsappUrl, '_blank');
             // Now, you can do whatever you want with the buddyData, 
             // e.g., open a modal to display the contact info or redirect to another page.
 

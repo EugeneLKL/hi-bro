@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Col, Row, Button, Modal, Pagination, Avatar, Space, Image } from 'antd';
+import { Card, Col, Row, Button, Modal, Pagination, Avatar, Space, Image, message } from 'antd';
 import { AiFillCheckCircle, AiFillCloseCircle, AiOutlineClockCircle } from 'react-icons/ai';
 import { MdOutlineTravelExplore } from 'react-icons/md';
 import { CiCalendarDate, CiSquareInfo, CiUser } from 'react-icons/ci';
@@ -51,12 +51,14 @@ const RequestingPost = () => {
                 try {
                     await axios.delete(`/api/deleteBuddyRequest/${requestId}`);
                     setCancelledRequests(prev => [...prev, requestId]);
+                    message.success("Successfully cancelled the request!"); // This line displays the success message.
                 } catch (error) {
                     console.log("Error while cancelling the request:", error);
                 }
             },
         });
     };
+    
 
     const handleViewUserDetails = (travelDetails, requestStatus) => {
         setCurrentDetails(travelDetails);
