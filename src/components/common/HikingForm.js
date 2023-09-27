@@ -53,11 +53,11 @@ const HikingForm = ({
               />
             </div>
           )}
-          <button className="form-hiking-discussion-button" type="submit">
-            {leftBtn}
-          </button>
           <button className="form-cancel-button" onClick={onCancel}>
             Cancel
+          </button>
+          <button className="form-hiking-discussion-button" type="submit">
+            {leftBtn}
           </button>
         </div>
       </form>

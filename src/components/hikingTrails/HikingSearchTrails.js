@@ -2,6 +2,7 @@ import styled, { keyframes } from "styled-components";
 import { SearchOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const rotateBackground = keyframes`
   0% {
@@ -132,7 +133,15 @@ const HikingSearchTrails = ({setTrails}) => {
   const handleClickSearch = () => {
     if (!searchTerm) {
       setSearchTerm("");
-      window.location.href = "/hikingTrails";
+      toast.error("No trails found", {
+        position: toast.POSITION.TOP_CENTER,
+        autoClose: 500,
+        hideProgressBar: true,
+        transition: toast.slideIn,
+      });
+      setTimeout(function () {
+        window.location.href = "/hikingTrails";
+      }, 1000);
     } else {
       handleSearch();
     }

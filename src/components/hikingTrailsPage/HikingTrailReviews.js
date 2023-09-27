@@ -40,7 +40,7 @@ const HikingTrailReviews = ({ trailId }) => {
               />
               <h5 className="review-username">{review.user.userName}</h5>
             </div>
-            <h1 className="review-title">{review.reviewTitle}</h1>
+            <h3 className="review-title">{review.reviewTitle}</h3>
             <div className="review-content">{review.reviewContent}</div>
           </div>
         </div>

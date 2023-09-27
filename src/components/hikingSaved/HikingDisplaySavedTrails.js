@@ -1,16 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import axios from "axios";
 import { useAuth } from "../../AuthContext";
 import { useQuery } from "react-query";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 
 const TrailsContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 20px;
   max-width: 1200px;
-  // width: 300px !important;
   margin: 20px auto;
 `;
 
@@ -47,6 +46,7 @@ const TrailDescription = styled.p`
 
 const HikingDisplaySavedTrails = () => {
   const { userId } = useAuth();
+  console.log(userId);
 
   const { data: trails, isLoading, error } = useQuery(
     "savedTrails",
@@ -58,9 +58,12 @@ const HikingDisplaySavedTrails = () => {
     {
       onSuccess: (data) => {
         toast.success("Trails loaded successfully!");
-      }
+      },
     }
   );
+
+  // Filter trails to display only those with the same userId
+  const filteredTrails = trails ? trails.filter((trail) => trail.userId === userId) : [];
 
   return (
     <TrailsContainer>
@@ -69,12 +72,17 @@ const HikingDisplaySavedTrails = () => {
       ) : error ? (
         <p>Error: {error.message}</p>
       ) : (
-        trails.map((trail) => (
-          <TrailCard key={trail.savedTrailsId}>
-            <TrailImage src={trail.trail.trailImagesUrl[0]} alt={trail.trail.trailName} />
+        filteredTrails.map((trail) => (
+          <TrailCard key={trail.trail.id}>
+            <TrailImage
+              src={trail.trail.trailImagesUrl[0]}
+              alt={trail.trail.trailName}
+            />
             <TrailContent>
               <TrailTitle>{trail.trail.trailName}</TrailTitle>
-              <TrailDescription>{trail.trail.trailDescription}</TrailDescription>
+              <TrailDescription>
+                {trail.trail.trailDescription}
+              </TrailDescription>
             </TrailContent>
           </TrailCard>
         ))
