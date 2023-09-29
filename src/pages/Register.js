@@ -56,7 +56,7 @@ const Register = () => {
   const [phoneRegistered, setPhoneRegistered] = useState(false);
 
   const [isPhotoUploaded, setIsPhotoUploaded] = useState(false);
-  
+
 
   const handleFileChange = async (fileList) => {
     if (fileList.length > 0) {
@@ -136,9 +136,7 @@ const Register = () => {
       );
     }
 
-    // Use regex to check for at least one uppercase, one lowercase, one digit, and one special character
-    const regex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
     if (!regex.test(value)) {
       return Promise.reject(
         new Error(
@@ -220,7 +218,6 @@ const Register = () => {
   };
 
   const onFinish = async (values) => {
-    console.log("Received values of form: ", values);
 
     const userName = values["userName"];
     const userEmail = values["userEmail"];
@@ -229,24 +226,14 @@ const Register = () => {
     const birthDate = values["birthDate"].format("DD-MM-YYYY");
     const password = values["password"];
 
-    // console log each declared variable
-    console.log("Name: ", userName);
-    console.log("Email: ", userEmail);
-    console.log("Phone: ", phoneNum);
-    console.log("Password:", password);
-    console.log("Gender: ", gender);
-    console.log("Birthdate: ", birthDate);
-
     // Check whether the email has been existed in the database
     const checkEmail = await axios.get("/api/checkEmail", {
       params: { userEmail: userEmail },
     });
 
     if (checkEmail.data === true) {
-      console.log("Email Not Existed");
       setEmailRegistered(false);
     } else {
-      console.log("Email Existed");
       setEmailRegistered(true);
     }
 
@@ -260,10 +247,7 @@ const Register = () => {
     if (checkPhone.data === true) {
       console.log("Phone Not Existed");
     } else {
-      console.log("Phone Existed");
-      console.log("Checking1: ", phoneRegistered);
       setPhoneRegistered(true);
-      console.log("Checking2: ", phoneRegistered);
     }
 
     if (checkPhone.data === false && checkEmail.data === false) {
@@ -285,53 +269,48 @@ const Register = () => {
     formData.append("birthDate", birthDate);
     formData.append("password", password);
 
-    // Sending the values get to the backend to be store in the database
-
     if (checkPhone.data === true && checkEmail.data === true) {
+      if (isPhotoUploaded) {
+        try {
+          // Get the signed URL from the server
+          const urlResponse = await axios.get("/api/s3Url", {
+            params: { contentType: selectedFile.type },
+          });
 
+          console.log("URL: ", urlResponse.data.url);
 
-    
-        if (isPhotoUploaded) {
-          try {
-            // Get the signed URL from the server
-            const urlResponse = await axios.get("/api/s3Url", {
-              params: { contentType: selectedFile.type },
-            });
+          const s3SignedUrl = urlResponse.data.url;
 
-            console.log("URL: ", urlResponse.data.url);
+          const profileImage = s3SignedUrl.split("?")[0];
 
-            const s3SignedUrl = urlResponse.data.url;
+          formData.append("profileImage", profileImage);
 
-            const profileImage = s3SignedUrl.split("?")[0];
+          // Use the signed URL to upload the image directly to S3
+          const uploadResponse = await axios.put(s3SignedUrl, selectedFile, {
+            headers: {
+              "Content-Type": selectedFile.type,
+            },
+          });
 
-            formData.append("profileImage", profileImage);
-
-            // Use the signed URL to upload the image directly to S3
-            const uploadResponse = await axios.put(s3SignedUrl, selectedFile, {
-              headers: {
-                "Content-Type": selectedFile.type,
-              },
-            });
-
-            console.log("Image uploaded to S3:", uploadResponse);
-          } catch (error) {
-            console.error("Error uploading image to S3:", error);
-          }
-        } else {
-          // If no image was uploaded, use the default profile picture
-          formData.append("profileImage", defaultProfilePicture);
+          console.log("Image uploaded to S3:", uploadResponse);
+        } catch (error) {
+          console.error("Error uploading image to S3:", error);
         }
+      } else {
+        // If no image was uploaded, use the default profile picture
+        formData.append("profileImage", defaultProfilePicture);
+      }
 
-        const response = await axios.post("/api/register", formData);
-        console.log("New user created:", response.data);
+      const response = await axios.post("/api/register", formData);
+      console.log("New user created:", response.data);
 
-        message.success("Register successfully!");
+      message.success("Register successfully!");
 
-        // Link to login page after 2 seconds
-        setTimeout(() => {
-          window.location.href = "/";
-        }, 2000);
-       
+      // Link to login page after 2 seconds
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 2000);
+
     }
   };
 
@@ -558,7 +537,9 @@ const Register = () => {
         >
           <Input.Password
             style={{ height: '50px', padding: 'auto' }}
-            iconRender={(visible) => (visible ? <EyeTwoTone style={{ fontSize: '16px', lineHeight: '40px' }} /> : <EyeInvisibleOutlined style={{ fontSize: '16px', lineHeight: '40px' }} />)}
+            iconRender={(visible) => (visible ?
+              <EyeTwoTone style={{ fontSize: '16px', lineHeight: '40px' }} /> :
+              <EyeInvisibleOutlined style={{ fontSize: '16px', lineHeight: '40px' }} />)}
           />
         </Form.Item>
 
